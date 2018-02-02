@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-01 17:54:05 dharms>
+;; Modified Time-stamp: <2018-02-02 08:30:00 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -27,6 +27,8 @@
 ;;
 
 ;;; Code:
+(require 'ht)
+
 (defgroup gridlock nil
   "Helper to navigate between fields, and explicate them."
   :group 'tools
@@ -36,25 +38,43 @@
   "Prefix key for `gridlock-mode'."
   :type 'vector)
 
-(defvar-local gridlock-points nil
+(defvar-local gridlock-points
+  (ht-create 'eq)
   "List of gridlock points in the current buffer.")
 
-(defvar gridlock-anchor-regexp nil
-  "Regexp representing the anchor point that defines what lines
-the user is interested in."
+(defvar gridlock-anchor-regex "^"
+  "Regexp identifying lines of interest.")
+(defvar gridlock-field-regex ","
+  "Regexp splitting fields per line.")
 
 (defun gridlock--find-next ()
   "Find location of next anchor point."
+  (let ((beg (search-forward-regexp gridlock-anchor-regex nil t)))
+    (when beg
+      (unless (ht-contains? gridlock-points beg)
+        (ht-set! gridlock-points beg
+                 (save-match-data
+                   (gridlock--parse-line beg)))
+      (goto-char beg)))))
 
-  (search-forward-regexp gridlock-anchor-regexp nil t)
-
+(defun gridlock--parse-line (beg)
+  "Parse the format of the line beginning at BEG."
+  (save-excursion
+    (let ((pt (point))
+          lst)
+      (while (search-forward-regexp gridlock-field-regex (eolp) t)
+        (push (list pt
+                    (buffer-substring-no-properties pt (point)))
+              lst)
+        (setq pt (point)))
+      lst)))
 
 
 (defun gridlock-define-keys (map)
   "Define in keymap MAP bindings for `gridlock-mode'."
-  )
+  nil)                                  ;todo
 
-(defun gridlock-mode-map
+(defvar gridlock-mode-map
     (let ((map (make-sparse-keymap)))
       (gridlock-define-keys map)
       map)
