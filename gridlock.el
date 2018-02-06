@@ -3,11 +3,11 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-02 08:30:00 dharms>
+;; Modified Time-stamp: <2018-02-06 08:49:59 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
-;; Package-Requires: ((emacs "24.3"))
+;; Package-Requires: ((emacs "24.4"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 ;;
 
 ;;; Code:
+(require 'subr-x)
 (require 'ht)
 
 (defgroup gridlock nil
@@ -38,36 +39,63 @@
   "Prefix key for `gridlock-mode'."
   :type 'vector)
 
-(defvar-local gridlock-points
+(defvar-local gridlock-buffer-points
   (ht-create 'eq)
   "List of gridlock points in the current buffer.")
 
 (defvar gridlock-anchor-regex "^"
   "Regexp identifying lines of interest.")
-(defvar gridlock-field-regex ","
+(defvar gridlock-field-delimiter ","
   "Regexp splitting fields per line.")
+(defvar gridlock-field-regex nil
+  "Describes the entire line to be split into fields.
+If nil, the entire string from the anchor point to the end of
+line will be used.")
+
+(defvar gridlock-parse-fields-inclusive t
+  "Whether to parse fields from beginning and end inclusively.")
 
 (defun gridlock--find-next ()
   "Find location of next anchor point."
-  (let ((beg (search-forward-regexp gridlock-anchor-regex nil t)))
+  (let ((pt (point))
+        (beg (search-forward-regexp gridlock-anchor-regex nil t)))
+    (when (eq beg pt)
+      (goto-char (1+ (point)))
+      (setq beg (search-forward-regexp gridlock-anchor-regex nil t)))
     (when beg
-      (unless (ht-contains? gridlock-points beg)
-        (ht-set! gridlock-points beg
+      (unless (ht-contains? gridlock-buffer-points beg)
+        (ht-set! gridlock-buffer-points beg
                  (save-match-data
                    (gridlock--parse-line beg)))
-      (goto-char beg)))))
+        (goto-char beg)))))
 
 (defun gridlock--parse-line (beg)
   "Parse the format of the line beginning at BEG."
   (save-excursion
-    (let ((pt (point))
-          lst)
-      (while (search-forward-regexp gridlock-field-regex (eolp) t)
-        (push (list pt
-                    (buffer-substring-no-properties pt (point)))
-              lst)
+    (let ((pt beg)
+          (end (line-end-position))
+          (idx 0)
+          lst str)
+      (goto-char beg)
+      (and gridlock-field-regex
+           (not (string-empty-p gridlock-field-regex))
+           (search-forward-regexp gridlock-field-regex end t)
+           (setq beg (match-beginning 0))
+           (setq end (match-end 0))
+           (goto-char beg))
+      (while (search-forward-regexp gridlock-field-delimiter end t)
+        (push
+         (list pt idx
+               (buffer-substring-no-properties
+                pt (match-beginning 0)))
+         lst)
+        (setq idx (1+ idx))
         (setq pt (point)))
-      lst)))
+      (when gridlock-parse-fields-inclusive
+        (setq str (buffer-substring-no-properties pt end))
+        (unless (string-empty-p str)
+          (push (list pt idx str) lst)))
+      (nreverse lst))))
 
 
 (defun gridlock-define-keys (map)
@@ -75,9 +103,9 @@
   nil)                                  ;todo
 
 (defvar gridlock-mode-map
-    (let ((map (make-sparse-keymap)))
-      (gridlock-define-keys map)
-      map)
+  (let ((map (make-sparse-keymap)))
+    (gridlock-define-keys map)
+    map)
   "Keymap for `gridlock-mode'.")
 
 (defun gridlock-define-prefix (map)
