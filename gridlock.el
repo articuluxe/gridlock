@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-06 08:49:59 dharms>
+;; Modified Time-stamp: <2018-02-06 08:57:27 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -52,8 +52,8 @@
 If nil, the entire string from the anchor point to the end of
 line will be used.")
 
-(defvar gridlock-parse-fields-inclusive t
-  "Whether to parse fields from beginning and end inclusively.")
+(defvar gridlock-buffer-metadata nil
+  "Stores metadata about a cell.")
 
 (defun gridlock--find-next ()
   "Find location of next anchor point."
@@ -91,10 +91,9 @@ line will be used.")
          lst)
         (setq idx (1+ idx))
         (setq pt (point)))
-      (when gridlock-parse-fields-inclusive
-        (setq str (buffer-substring-no-properties pt end))
-        (unless (string-empty-p str)
-          (push (list pt idx str) lst)))
+      (setq str (buffer-substring-no-properties pt end))
+      (unless (string-empty-p str)
+        (push (list pt idx str) lst))
       (nreverse lst))))
 
 
