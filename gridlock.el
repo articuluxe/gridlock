@@ -35,7 +35,7 @@
   :group 'tools
   :prefix "gridlock")
 
-(defcustom gridlock-prefix-key (kbd "M-p")
+(defcustom gridlock-prefix-key (kbd "C-c C-o")
   "Prefix key for `gridlock-mode'."
   :type 'vector)
 
