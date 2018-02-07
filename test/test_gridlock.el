@@ -5,7 +5,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, February  2, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-02-06 08:58:35 dharms>
+;; Modified Time-stamp: <2018-02-07 12:27:47 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: test gridlock
 
@@ -31,7 +31,7 @@
 (require 'gridlock)
 
 (ert-deftest gridlock-test-search-forward ()
-  "Test movement."
+  "Test basic parsing and searching forward."
   (with-temp-buffer
     (insert "One,Two,Three,\n1,2,3\n4,5,6")
     (gridlock-mode 1)
@@ -40,9 +40,8 @@
     (should (looking-at "One"))
     (should (eq (point) 1))
     (gridlock--find-next)
-;    (should (eq (point) 15))
     (should (looking-at "1"))
-    (should (equal (ht-get gridlock-buffer-points 16)
+    (should (equal (ht-get gridlock-buffer-points (point))
                    `((16 0 "1")
                      (18 1 "2")
                      (20 2 "3"))))
@@ -50,9 +49,34 @@
     (goto-char 5)
     (should (looking-at "Two"))
     (gridlock--find-next)
-;    (should (eq (point) 16))
     (should (looking-at "1"))
-  ))
+    ))
+
+(ert-deftest gridlock-test-parse-delimited-fields ()
+  "Test parsing delimited fields."
+  (with-temp-buffer
+    (setq-local gridlock-field-regex-begin "#")
+    (setq-local gridlock-field-regex-end "@")
+    (insert "One,Two,Three\n,,#1,2,3,\n#4,5,6\n,,,#7,8,9@,,,")
+    (gridlock-mode 1)
+    (goto-char 1)
+    (should (looking-at "One"))
+    (gridlock--find-next)
+    (should (equal (ht-get gridlock-buffer-points (point))
+                   '((18 0 "1")
+                     (20 1 "2")
+                     (22 2 "3"))))
+    (gridlock--find-next)
+    (should (equal (ht-get gridlock-buffer-points (point))
+                   '((26 0 "4")
+                     (28 1 "5")
+                     (30 2 "6"))))
+    (gridlock--find-next)
+    (should (equal (ht-get gridlock-buffer-points (point))
+                   '((36 0 "7")
+                     (38 1 "8")
+                     (40 2 "9"))))
+    ))
 
 (ert-run-tests-batch-and-exit (car argv))
 

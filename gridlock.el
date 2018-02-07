@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-06 08:57:27 dharms>
+;; Modified Time-stamp: <2018-02-07 12:26:09 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -35,7 +35,7 @@
   :group 'tools
   :prefix "gridlock")
 
-(defcustom gridlock-prefix-key (kbd "C-c C-o")
+(defcustom gridlock-prefix-key (kbd "C-c C-g")
   "Prefix key for `gridlock-mode'."
   :type 'vector)
 
@@ -47,10 +47,12 @@
   "Regexp identifying lines of interest.")
 (defvar gridlock-field-delimiter ","
   "Regexp splitting fields per line.")
-(defvar gridlock-field-regex nil
-  "Describes the entire line to be split into fields.
-If nil, the entire string from the anchor point to the end of
-line will be used.")
+(defvar gridlock-field-regex-begin nil
+  "Regexp to delimit the start of the fields to be scanned per line.
+If nil, the entire string from the anchor point will be used.")
+(defvar gridlock-field-regex-end nil
+  "Regexp to delimit the end of the fields to be scanned per line.
+If nil, the entire string to the end of line will be used.")
 
 (defvar gridlock-buffer-metadata nil
   "Stores metadata about a cell.")
@@ -77,21 +79,28 @@ line will be used.")
           (idx 0)
           lst str)
       (goto-char beg)
-      (and gridlock-field-regex
-           (not (string-empty-p gridlock-field-regex))
-           (search-forward-regexp gridlock-field-regex end t)
-           (setq beg (match-beginning 0))
-           (setq end (match-end 0))
-           (goto-char beg))
+      (and gridlock-field-regex-begin
+           (not (string-empty-p gridlock-field-regex-begin))
+           (search-forward-regexp gridlock-field-regex-begin end t)
+           (setq beg (or (match-end 0) beg))
+           (setq pt beg)
+           (goto-char beg)
+           gridlock-field-regex-end
+           (not (string-empty-p gridlock-field-regex-end))
+           (search-forward-regexp gridlock-field-regex-end end t)
+           (setq end (or (match-beginning 0) end))
+           ;; (message "pre: beg %d end %d" beg end)
+           (goto-char beg)
+           )
       (while (search-forward-regexp gridlock-field-delimiter end t)
-        (push
-         (list pt idx
-               (buffer-substring-no-properties
-                pt (match-beginning 0)))
-         lst)
+        (setq str (buffer-substring-no-properties
+                   pt (match-beginning 0)))
+        ;; (message "during: pt is %d, end is %d, str is %s" pt end str)
+        (push (list pt idx str) lst)
         (setq idx (1+ idx))
         (setq pt (point)))
       (setq str (buffer-substring-no-properties pt end))
+      ;; (message "post: end pt is %d, end is %d, str is %s" pt end str)
       (unless (string-empty-p str)
         (push (list pt idx str) lst))
       (nreverse lst))))
