@@ -5,7 +5,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, February  2, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-02-07 12:27:47 dharms>
+;; Modified Time-stamp: <2018-02-07 13:23:32 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: test gridlock
 
@@ -39,7 +39,7 @@
     (goto-char 1)
     (should (looking-at "One"))
     (should (eq (point) 1))
-    (gridlock--find-next)
+    (gridlock-goto-next-line)
     (should (looking-at "1"))
     (should (equal (ht-get gridlock-buffer-points (point))
                    `((16 0 "1")
@@ -48,8 +48,29 @@
     ;; search forward from middle
     (goto-char 5)
     (should (looking-at "Two"))
-    (gridlock--find-next)
+    (gridlock-goto-next-line)
     (should (looking-at "1"))
+    ))
+
+(ert-deftest gridlock-test-search-backward ()
+  "Test basic parsing and searching backward."
+  (with-temp-buffer
+    (insert "One,Two,Three,\n1,2,3\n4,5,6")
+    (gridlock-mode 1)
+    ;; search backward
+    (goto-char 22)
+    (should (looking-at "4"))
+    (gridlock-goto-prev-line)
+    (should (looking-at "1"))
+    (should (equal (ht-get gridlock-buffer-points (point))
+                   `((16 0 "1")
+                     (18 1 "2")
+                     (20 2 "3"))))
+    ;; search backward from middle of field
+    (goto-char 24)
+    (should (looking-at "5"))
+    (gridlock-goto-prev-line)
+    (should (looking-at "4"))
     ))
 
 (ert-deftest gridlock-test-parse-delimited-fields ()
@@ -61,17 +82,17 @@
     (gridlock-mode 1)
     (goto-char 1)
     (should (looking-at "One"))
-    (gridlock--find-next)
+    (gridlock-goto-next-line)
     (should (equal (ht-get gridlock-buffer-points (point))
                    '((18 0 "1")
                      (20 1 "2")
                      (22 2 "3"))))
-    (gridlock--find-next)
+    (gridlock-goto-next-line)
     (should (equal (ht-get gridlock-buffer-points (point))
                    '((26 0 "4")
                      (28 1 "5")
                      (30 2 "6"))))
-    (gridlock--find-next)
+    (gridlock-goto-next-line)
     (should (equal (ht-get gridlock-buffer-points (point))
                    '((36 0 "7")
                      (38 1 "8")

@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-07 12:26:09 dharms>
+;; Modified Time-stamp: <2018-02-07 13:27:04 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -54,22 +54,70 @@ If nil, the entire string from the anchor point will be used.")
   "Regexp to delimit the end of the fields to be scanned per line.
 If nil, the entire string to the end of line will be used.")
 
-(defvar gridlock-buffer-metadata nil
+(defvar-local gridlock-buffer-metadata nil
   "Stores metadata about a cell.")
 
-(defun gridlock--find-next ()
-  "Find location of next anchor point."
+(defun gridlock--find-current-line ()
+  "Find location, if any, of anchor point on current line."
+  (let (pt)
+    (save-excursion
+      (goto-char (line-beginning-position))
+      (when (setq pt (search-forward-regexp gridlock-anchor-regex (line-end-position) t))
+        (gridlock--on-anchor-found pt))
+      pt)))
+
+;;;###autoload
+(defun gridlock-goto-next-line ()
+  "Advance point to next anchor point."
+  (interactive)
+  (let ((pt (gridlock--find-next-line)))
+    (if pt (goto-char pt)
+      (message "No further lines."))))
+
+(defun gridlock--find-next-line ()
+  "Return location, if any, of next anchor point."
   (let ((pt (point))
-        (beg (search-forward-regexp gridlock-anchor-regex nil t)))
-    (when (eq beg pt)
-      (goto-char (1+ (point)))
-      (setq beg (search-forward-regexp gridlock-anchor-regex nil t)))
-    (when beg
-      (unless (ht-contains? gridlock-buffer-points beg)
-        (ht-set! gridlock-buffer-points beg
+        beg)
+    (save-excursion
+      (setq beg (search-forward-regexp gridlock-anchor-regex nil t))
+      (when (eq beg pt)
+        (goto-char (1+ (point)))
+        (setq beg (search-forward-regexp gridlock-anchor-regex nil t)))
+      (when beg
+        (gridlock--on-anchor-found beg)
+        beg))))
+
+;;;###autoload
+(defun gridlock-goto-prev-line ()
+  "Advance point to prior anchor point."
+  (interactive)
+  (let ((pt (gridlock--find-prev-line)))
+    (if pt (goto-char pt)
+      (message "No prior lines."))))
+
+(defun gridlock--find-prev-line ()
+  "Return location, if any, of prior anchor point."
+  (let ((pt (point))
+        beg)
+    (save-excursion
+      (setq beg (search-backward-regexp gridlock-anchor-regex nil t))
+      (when (eq beg pt)
+        (goto-char (1- (point)))
+        (setq beg (search-backward-regexp gridlock-anchor-regex nil t)))
+      (when beg
+        (gridlock--on-anchor-found beg)
+        beg))))
+
+(defun gridlock--on-anchor-found (beg)
+  "An anchor point has been found at position BEG on a line."
+  (unless (ht-contains? gridlock-buffer-points beg)
+    (ht-set! gridlock-buffer-points beg
                  (save-match-data
-                   (gridlock--parse-line beg)))
-        (goto-char beg)))))
+                   (gridlock--parse-line beg))))
+  ;; maybe move this to the minor-mode activation?
+  (unless gridlock-buffer-metadata
+    (setq gridlock-buffer-metadata
+          (gridlock--get-buffer-metadata))))
 
 (defun gridlock--parse-line (beg)
   "Parse the format of the line beginning at BEG."
@@ -105,10 +153,16 @@ If nil, the entire string to the end of line will be used.")
         (push (list pt idx str) lst))
       (nreverse lst))))
 
+(defun gridlock--get-buffer-metadata ()
+  "Get the metadata for the current buffer."
+  ;; todo
+  nil)
 
 (defun gridlock-define-keys (map)
   "Define in keymap MAP bindings for `gridlock-mode'."
-  nil)                                  ;todo
+  (define-key map "n" 'gridlock-goto-next-line)
+  (define-key map "p" 'gridlock-goto-prev-line)
+  )
 
 (defvar gridlock-mode-map
   (let ((map (make-sparse-keymap)))
