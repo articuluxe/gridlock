@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-07 13:27:04 dharms>
+;; Modified Time-stamp: <2018-02-08 08:23:36 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -144,14 +144,27 @@ If nil, the entire string to the end of line will be used.")
         (setq str (buffer-substring-no-properties
                    pt (match-beginning 0)))
         ;; (message "during: pt is %d, end is %d, str is %s" pt end str)
-        (push (list pt idx str) lst)
+        (push (list (cons pt (match-beginning 0)) idx str) lst)
         (setq idx (1+ idx))
         (setq pt (point)))
       (setq str (buffer-substring-no-properties pt end))
       ;; (message "post: end pt is %d, end is %d, str is %s" pt end str)
       (unless (string-empty-p str)
-        (push (list pt idx str) lst))
+        (push (list (cons pt end) idx str) lst))
       (nreverse lst))))
+
+(defun gridlock-field-get-bounds (field)
+  "Given a record FIELD, return its bounds.
+This is a cons cell (BEG . END) of the field's bounds."
+  (nth 0 field))
+
+(defun gridlock-field-get-index (field)
+  "Given a record FIELD, return its index."
+  (nth 1 field))
+
+(defun gridlock-field-get-str (field)
+  "Given a record FIELD, return its string value."
+  (nth 2 field))
 
 (defun gridlock--get-buffer-metadata ()
   "Get the metadata for the current buffer."
