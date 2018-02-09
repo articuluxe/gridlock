@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-09 10:46:17 dharms>
+;; Modified Time-stamp: <2018-02-09 11:24:14 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -57,14 +57,15 @@ If nil, the entire string to the end of line will be used.")
 (defvar-local gridlock-buffer-metadata nil
   "Stores metadata about a cell.")
 
-(defun gridlock--find-current-line ()
-  "Find location, if any, of anchor point on current line."
-  (let (pt)
+(defun gridlock--find-anchor-on-line (pt)
+  "Find location, if any, of anchor point on line containing PT."
+  (let (anchor)
     (save-excursion
+      (goto-char pt)
       (goto-char (line-beginning-position))
-      (when (setq pt (search-forward-regexp gridlock-anchor-regex (line-end-position) t))
-        (gridlock--on-anchor-found pt))
-      pt)))
+      (when (setq anchor (search-forward-regexp gridlock-anchor-regex (line-end-position) t))
+        (gridlock--on-anchor-found anchor))
+      anchor)))
 
 (defun gridlock-reset ()
   "Reset gridlock state in current buffer."
@@ -178,18 +179,21 @@ This is a cons cell (BEG . END) of the field's bounds."
   ;; todo access metadata
   nil)
 
-(defun gridlock-get-field (point)
-  "Return the field, if any, associated with POINT."
-  (let ((pt (gridlock--find-current-line))) ;todo point unused
-    (and pt (ht-get gridlock-buffer-points pt)
-         ;; todo lookup from point to field index
-         )))
+(defun gridlock-get-field-at (point)
+  "Return the field, if any, that POINT lies on."
+  (let ((fields (gridlock-get-fields-at point)))
+    (gridlock--lookup-field-at-pos fields point)))
 
-(defun gridlock-lookup-field (lst pt)
-  "Lookup in field list LST what field, if any, PT is within."
+(defun gridlock-get-fields-at (point)
+  "Return the fields, if any, existing on line containing POINT."
+  (let ((anchor (gridlock--find-anchor-on-line point)))
+    (ht-get gridlock-buffer-points anchor)))
+
+(defun gridlock--lookup-field-at-pos (fields pt)
+  "Lookup in field list FIELDS what field, if any, PT is within."
   (let (bounds)
     (catch 'found
-      (dolist (elt lst)
+      (dolist (elt fields)
         (setq bounds (gridlock-field-get-bounds elt))
         (when (and (>= pt (car bounds))
                    (< pt (cdr bounds)))
