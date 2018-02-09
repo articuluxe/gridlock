@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-08 08:23:36 dharms>
+;; Modified Time-stamp: <2018-02-09 10:46:17 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -65,6 +65,13 @@ If nil, the entire string to the end of line will be used.")
       (when (setq pt (search-forward-regexp gridlock-anchor-regex (line-end-position) t))
         (gridlock--on-anchor-found pt))
       pt)))
+
+(defun gridlock-reset ()
+  "Reset gridlock state in current buffer."
+  (interactive)
+  (ht-clear! gridlock-buffer-points)
+  ;; todo clear metadata
+  )
 
 ;;;###autoload
 (defun gridlock-goto-next-line ()
@@ -147,10 +154,10 @@ If nil, the entire string to the end of line will be used.")
         (push (list (cons pt (match-beginning 0)) idx str) lst)
         (setq idx (1+ idx))
         (setq pt (point)))
-      (setq str (buffer-substring-no-properties pt end))
+      (setq str (string-trim (buffer-substring-no-properties pt end)))
       ;; (message "post: end pt is %d, end is %d, str is %s" pt end str)
       (unless (string-empty-p str)
-        (push (list (cons pt end) idx str) lst))
+        (push (list (cons pt (+ pt (length str))) idx str) lst))
       (nreverse lst))))
 
 (defun gridlock-field-get-bounds (field)
@@ -165,6 +172,28 @@ This is a cons cell (BEG . END) of the field's bounds."
 (defun gridlock-field-get-str (field)
   "Given a record FIELD, return its string value."
   (nth 2 field))
+
+(defun gridlock-field-get-title (field)
+  "Given a record FIELD, return its grid's title."
+  ;; todo access metadata
+  nil)
+
+(defun gridlock-get-field (point)
+  "Return the field, if any, associated with POINT."
+  (let ((pt (gridlock--find-current-line))) ;todo point unused
+    (and pt (ht-get gridlock-buffer-points pt)
+         ;; todo lookup from point to field index
+         )))
+
+(defun gridlock-lookup-field (lst pt)
+  "Lookup in field list LST what field, if any, PT is within."
+  (let (bounds)
+    (catch 'found
+      (dolist (elt lst)
+        (setq bounds (gridlock-field-get-bounds elt))
+        (when (and (>= pt (car bounds))
+                   (< pt (cdr bounds)))
+          (throw 'found elt))))))
 
 (defun gridlock--get-buffer-metadata ()
   "Get the metadata for the current buffer."
@@ -199,7 +228,9 @@ This is a cons cell (BEG . END) of the field's bounds."
   :lighter " GRID"
   :keymap gridlock-prefix-map
   (if gridlock-mode
-      (gridlock-define-prefix global-map)
+      (progn
+        (gridlock-define-prefix global-map)
+        (gridlock-reset))
     t))
 
 (provide 'gridlock)

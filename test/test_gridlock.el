@@ -5,7 +5,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, February  2, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-02-08 08:21:33 dharms>
+;; Modified Time-stamp: <2018-02-09 10:44:21 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: test gridlock
 
@@ -101,10 +101,10 @@
 
 (ert-deftest gridlock-test-parse-delimited-fields ()
   "Test parsing delimited fields."
-  (let (field)
+  (let ((gridlock-field-regex-begin "#")
+        (gridlock-field-regex-end "@")
+        field)
     (with-temp-buffer
-      (setq-local gridlock-field-regex-begin "#")
-      (setq-local gridlock-field-regex-end "@")
       (insert "One,Two,Three\n,,#1,2,3,\n#4,5,6\n,,,#7,8,9@,,,")
       (gridlock-mode 1)
       (goto-char 1)
@@ -161,6 +161,45 @@
       (should (eq (gridlock-field-get-index field) 2))
       (should (string= (gridlock-field-get-str field) "9"))
       )))
+
+(ert-deftest gridlock-test-field-navigation ()
+  "Test navigating between fields."
+  (let ((gridlock-field-regex-begin "#")
+        (gridlock-field-regex-end "@")
+        fields field)
+    (with-temp-buffer
+      (insert "One,Two,Three,\n#1,2,3@,o,\n4,5,6")
+      (gridlock-mode 1)
+      ;; look up from 1st field
+      (goto-char 17)
+      (should (looking-at "1"))
+      (setq fields (ht-get gridlock-buffer-points (gridlock--find-current-line)))
+      (setq field (nth 0 fields))
+      (should (string= (gridlock-field-get-str field) "1")) ;confirm we parsed field list
+      (should (eq (gridlock-field-get-index (gridlock-lookup-field fields 17)) 0))
+      ;; look up from 2nd field
+      (goto-char 19)
+      (should (looking-at "2"))
+      (setq fields (ht-get gridlock-buffer-points (gridlock--find-current-line)))
+      (setq field (nth 0 fields))
+      (should (string= (gridlock-field-get-str field) "1")) ;confirm we parsed field list
+      (should (eq (gridlock-field-get-index (gridlock-lookup-field fields 19)) 1))
+      ;; look up from delimiter after 2nd field, should return nil
+      (goto-char 20)
+      (should (looking-at ","))
+      (setq fields (ht-get gridlock-buffer-points (gridlock--find-current-line)))
+      (setq field (nth 0 fields))
+      (should (string= (gridlock-field-get-str field) "1")) ;confirm we parsed field list
+      (should (not (gridlock-lookup-field fields 20)))      ;should be nil
+      ;; look up after delimited range, should return nil
+      (goto-char 23)
+      (should (looking-at ","))
+      (setq fields (ht-get gridlock-buffer-points (gridlock--find-current-line)))
+      (setq field (nth 0 fields))
+      (should (string= (gridlock-field-get-str field) "1")) ;confirm we parsed field list
+      (should (not (gridlock-lookup-field fields 23)))      ;should be nil
+      )))
+
 
 (ert-run-tests-batch-and-exit (car argv))
 
