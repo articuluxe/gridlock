@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-13 17:41:03 dharms>
+;; Modified Time-stamp: <2018-02-13 17:51:50 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -211,6 +211,17 @@ This is a cons cell (BEG . END) of the field's bounds."
             (throw 'found i))
           (setq i (1+ i)))
         nil))))
+
+(defun gridlock--get-next-field (fields idx)
+  "Return the next field from FIELDS after IDX, if it exists."
+  (let ((i (1+ idx)))
+    (and (< i (length fields)) i)))
+
+(defun gridlock--get-previous-field (fields idx)
+  "Return the previous field from FIELDS before IDX, if it exists."
+  (and (<= idx (length fields))
+       (> idx 0)
+       (1- idx)))
 
 (defun gridlock--get-buffer-metadata ()
   "Get the metadata for the current buffer."
