@@ -5,7 +5,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, February  2, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-02-13 17:20:01 dharms>
+;; Modified Time-stamp: <2018-02-13 17:42:09 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: test gridlock
 
@@ -177,7 +177,7 @@
       (setq fields (gridlock-get-fields-at pt))
       (setq field (aref fields 0))
       (should (string= (gridlock-field-get-str field) "1")) ;confirm we parsed field list
-      (should (eq (gridlock-field-get-index (gridlock--lookup-field-at-pos fields pt)) 0))
+      (should (eq (gridlock--lookup-field-at-pos fields pt) 0))
       (should (eq (gridlock-field-get-index (gridlock-get-field-at pt)) 0))
       ;; look up from 2nd field
       (setq pt 19)
@@ -186,7 +186,7 @@
       (setq fields (gridlock-get-fields-at pt))
       (setq field (aref fields 0))
       (should (string= (gridlock-field-get-str field) "1")) ;confirm we parsed field list
-      (should (eq (gridlock-field-get-index (gridlock--lookup-field-at-pos fields pt)) 1))
+      (should (eq (gridlock--lookup-field-at-pos fields pt) 1))
       (should (eq (gridlock-field-get-index (gridlock-get-field-at pt)) 1))
       ;; look up from delimiter after 2nd field, should return nil
       (setq pt 20)

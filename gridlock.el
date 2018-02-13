@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-13 08:56:12 dharms>
+;; Modified Time-stamp: <2018-02-13 17:41:03 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -70,8 +70,12 @@ If nil, the entire string to the end of line will be used.")
 (defun gridlock-reset ()
   "Reset gridlock state in current buffer."
   (interactive)
-  (ht-clear! gridlock-buffer-points)
-  ;; todo clear metadata
+  (ht-clear! gridlock-buffer-points))
+
+(defun gridlock-reset-metadata ()
+  "Reset metadata associated with current buffer."
+  (interactive)
+  ;; todo
   )
 
 ;;;###autoload
@@ -183,8 +187,9 @@ This is a cons cell (BEG . END) of the field's bounds."
 
 (defun gridlock-get-field-at (point)
   "Return the field, if any, that POINT lies on."
-  (let ((fields (gridlock-get-fields-at point)))
-    (gridlock--lookup-field-at-pos fields point)))
+  (let* ((fields (gridlock-get-fields-at point))
+         (idx (gridlock--lookup-field-at-pos fields point)))
+    (and idx (aref fields idx))))
 
 (defun gridlock-get-fields-at (point)
   "Return the fields, if any, existing on line containing POINT."
@@ -193,15 +198,18 @@ This is a cons cell (BEG . END) of the field's bounds."
 
 (defun gridlock--lookup-field-at-pos (fields pt)
   "Lookup in field list FIELDS what field, if any, PT is within."
-  (let (bounds)
+  (let ((len (length fields))
+        (i 0)
+        elt bounds)
     (catch 'found
       (progn
-        (mapc (lambda (elt)
-                (setq bounds (gridlock-field-get-bounds elt))
-                (when (and (>= pt (car bounds))
-                           (< pt (cdr bounds)))
-                  (throw 'found elt)))
-              fields)
+        (while (< i len)
+          (setq elt (aref fields i))
+          (setq bounds (gridlock-field-get-bounds elt))
+          (when (and (>= pt (car bounds))
+                     (< pt (cdr bounds)))
+            (throw 'found i))
+          (setq i (1+ i)))
         nil))))
 
 (defun gridlock--get-buffer-metadata ()
