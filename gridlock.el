@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-14 08:47:08 dharms>
+;; Modified Time-stamp: <2018-02-14 17:17:06 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -272,6 +272,7 @@ This is a cons cell (BEG . END) of the field's bounds."
   (define-key map (kbd "<up>") 'gridlock-goto-prev-line)
   (define-key map (kbd "<left>") 'gridlock-goto-previous-field)
   (define-key map (kbd "<right>") 'gridlock-goto-next-field)
+  (define-key map [t] 'gridlock-turn-off)
   )
 
 (defvar gridlock-mode-map
@@ -290,11 +291,16 @@ This is a cons cell (BEG . END) of the field's bounds."
     map)
   "Prefix keymap for `gridlock-mode'.")
 
+(defun gridlock-turn-off ()
+  "Turn off `gridlock-mode'."
+  (interactive)
+  (gridlock-mode -1))
+
 (define-minor-mode gridlock-mode
   "Navigate between and explicate fields."
   :init-value nil
   :lighter " GRID"
-  :keymap gridlock-prefix-map
+  :keymap gridlock-mode-map
   (if gridlock-mode
       (progn
         (gridlock-define-prefix global-map)
