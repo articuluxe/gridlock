@@ -5,7 +5,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, February  2, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-02-13 17:52:34 dharms>
+;; Modified Time-stamp: <2018-02-13 18:01:05 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: test gridlock
 
@@ -181,6 +181,8 @@
       (should (eq (gridlock-field-get-index (gridlock-get-field-at pt)) 0))
       (should (eq (gridlock--get-next-field fields 0) 1))
       (should (not (gridlock--get-previous-field fields 0)))
+      (should (not (gridlock-get-previous-field pt)))
+      (should (eq (gridlock-field-get-index (gridlock-get-next-field pt)) 1))
       ;; look up from 2nd field
       (setq pt 19)
       (goto-char pt)
@@ -192,6 +194,8 @@
       (should (eq (gridlock-field-get-index (gridlock-get-field-at pt)) 1))
       (should (eq (gridlock--get-next-field fields 1) 2))
       (should (eq (gridlock--get-previous-field fields 1) 0))
+      (should (eq (gridlock-field-get-index (gridlock-get-previous-field pt)) 0))
+      (should (eq (gridlock-field-get-index (gridlock-get-next-field pt)) 2))
       ;; look up from delimiter after 2nd field, should return nil
       (setq pt 20)
       (goto-char pt)
@@ -201,6 +205,8 @@
       (should (string= (gridlock-field-get-str field) "1")) ;confirm we parsed field list
       (should (not (gridlock--lookup-field-at-pos fields pt)))      ;should be nil
       (should (not (gridlock-get-field-at pt)))
+      (should (not (gridlock-get-previous-field pt)))
+      (should (not (gridlock-get-next-field pt)))
       ;; look up after delimited range, should return nil
       (setq pt 23)
       (goto-char pt)
@@ -210,6 +216,8 @@
       (should (string= (gridlock-field-get-str field) "1")) ;confirm we parsed field list
       (should (not (gridlock--lookup-field-at-pos fields pt)))      ;should be nil
       (should (not (gridlock-get-field-at pt)))
+      (should (not (gridlock-get-previous-field pt)))
+      (should (not (gridlock-get-next-field pt)))
       )))
 
 

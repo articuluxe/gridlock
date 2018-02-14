@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-13 17:51:50 dharms>
+;; Modified Time-stamp: <2018-02-13 18:03:02 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -211,6 +211,26 @@ This is a cons cell (BEG . END) of the field's bounds."
             (throw 'found i))
           (setq i (1+ i)))
         nil))))
+
+(defun gridlock-get-previous-field (point)
+  "Return the field, if any, that precedes that at POINT."
+  (let* ((fields (gridlock-get-fields-at point))
+         (idx (gridlock--lookup-field-at-pos fields point))
+         prev)
+    (and idx
+         (setq prev (gridlock--get-previous-field fields idx))
+         prev
+         (aref fields prev))))
+
+(defun gridlock-get-next-field (point)
+  "Return the field, if any, following that at POINT."
+  (let* ((fields (gridlock-get-fields-at point))
+         (idx (gridlock--lookup-field-at-pos fields point))
+         prev)
+    (and idx
+         (setq prev (gridlock--get-next-field fields idx))
+         prev
+         (aref fields prev))))
 
 (defun gridlock--get-next-field (fields idx)
   "Return the next field from FIELDS after IDX, if it exists."
