@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-13 18:03:02 dharms>
+;; Modified Time-stamp: <2018-02-14 08:47:08 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -106,6 +106,24 @@ If nil, the entire string to the end of line will be used.")
   (let ((pt (gridlock--find-prev-line)))
     (if pt (goto-char pt)
       (message "No prior lines."))))
+
+;;;###autoload
+(defun gridlock-goto-next-field ()
+  "Move point to the next field, if any, on current line."
+  (interactive)
+  (let ((fld (gridlock-get-next-field (point))))
+    (if fld
+        (goto-char (car (gridlock-field-get-bounds fld)))
+      (message "No further fields on this line."))))
+
+;;;###autoload
+(defun gridlock-goto-previous-field ()
+  "Move point to the previous field, if any, on current line."
+  (interactive)
+  (let ((fld (gridlock-get-previous-field (point))))
+    (if fld
+        (goto-char (car (gridlock-field-get-bounds fld)))
+      (message "No further fields on this line."))))
 
 (defun gridlock--find-prev-line ()
   "Return location, if any, of prior anchor point."
@@ -250,8 +268,10 @@ This is a cons cell (BEG . END) of the field's bounds."
 
 (defun gridlock-define-keys (map)
   "Define in keymap MAP bindings for `gridlock-mode'."
-  (define-key map "n" 'gridlock-goto-next-line)
-  (define-key map "p" 'gridlock-goto-prev-line)
+  (define-key map (kbd "<down>") 'gridlock-goto-next-line)
+  (define-key map (kbd "<up>") 'gridlock-goto-prev-line)
+  (define-key map (kbd "<left>") 'gridlock-goto-previous-field)
+  (define-key map (kbd "<right>") 'gridlock-goto-next-field)
   )
 
 (defvar gridlock-mode-map
