@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-19 08:56:02 dharms>
+;; Modified Time-stamp: <2018-02-19 17:46:02 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -59,12 +59,13 @@ If nil, the entire string to the end of line will be used.")
 
 (defun gridlock--find-anchor-on-line (pt)
   "Find location, if any, of anchor point on line containing PT."
-  (let (anchor)
+  (let (anchor fields)
     (save-excursion
       (goto-char pt)
       (goto-char (line-beginning-position))
-      (when (setq anchor (search-forward-regexp gridlock-anchor-regex (line-end-position) t))
-        (gridlock--on-anchor-found anchor))
+      (and (setq anchor (search-forward-regexp gridlock-anchor-regex (line-end-position) t))
+           (setq fields (gridlock--check-anchor anchor))
+           (gridlock--on-anchor-found anchor fields))
       anchor)))
 
 (defun gridlock-reset ()
@@ -100,9 +101,10 @@ If nil, the entire string to the end of line will be used.")
         (setq beg (search-forward-regexp gridlock-anchor-regex nil t)))
       (if beg
           (progn
-            (gridlock--on-anchor-found beg)
-            (setq fields (gridlock-get-fields-at beg))
-            (if (< idx (length fields))
+            (and
+             (setq fields (gridlock--check-anchor beg))
+             (gridlock--on-anchor-found beg fields))
+            (if (and idx (< idx (length fields)))
                 (car (gridlock-field-get-bounds (aref fields idx)))
               beg))
         nil))))
@@ -122,7 +124,7 @@ If nil, the entire string to the end of line will be used.")
          (fields (gridlock-get-fields-at anchor))
          (idx (gridlock--lookup-field-at-pos fields pt))
          beg)
-    ;; (message "drh prev pt %d anchor %d idx %d" pt anchor idx)
+    ;; (message "drh prev pt %d anchor %d idx %d" pt anchor (if idx idx -34))
     (when anchor
       (setq pt anchor))
     (save-excursion
@@ -133,9 +135,9 @@ If nil, the entire string to the end of line will be used.")
         (setq beg (search-backward-regexp gridlock-anchor-regex nil t)))
       (if beg
           (progn
-            (gridlock--on-anchor-found beg)
-            (setq fields (gridlock-get-fields-at beg))
-            (if (< idx (length fields))
+            (when (setq fields (gridlock--check-anchor beg))
+                 (gridlock--on-anchor-found beg fields))
+            (if (and idx (< idx (length fields)))
                 (car (gridlock-field-get-bounds (aref fields idx)))
               beg))
         nil))))
@@ -194,12 +196,16 @@ If nil, the entire string to the end of line will be used.")
         (goto-char (car (gridlock-field-get-bounds fld)))
       (message "No further fields on this line."))))
 
-(defun gridlock--on-anchor-found (beg)
-  "An anchor point has been found at position BEG on a line."
-  (unless (ht-contains? gridlock-buffer-points beg)
-    (ht-set! gridlock-buffer-points beg
-             (save-match-data       ;todo needed?
-               (gridlock--parse-line beg))))
+(defun gridlock--check-anchor (anchor)
+  "Validate what fields can be parsed from anchor point ANCHOR.
+If none, return nil.  If some, return those fields."
+  (let ((fields (gridlock--parse-line anchor)))
+    (if (> (length fields) 0) fields nil)))
+
+(defun gridlock--on-anchor-found (anchor fields)
+  "Mark that anchor point ANCHOR is associated with FIELDS."
+  (unless (ht-contains? gridlock-buffer-points anchor)
+    (ht-set! gridlock-buffer-points anchor fields))
   ;; maybe move this to the minor-mode activation?
   (unless gridlock-buffer-metadata
     (setq gridlock-buffer-metadata
@@ -208,38 +214,39 @@ If nil, the entire string to the end of line will be used.")
 (defun gridlock--parse-line (beg)
   "Parse the format of the line beginning at BEG."
   (save-excursion
-    (let ((pt beg)
-          (end (line-end-position))
-          (idx 0)
-          lst str vec)
-      (goto-char beg)
-      (and gridlock-field-regex-begin
-           (not (string-empty-p gridlock-field-regex-begin))
-           (search-forward-regexp gridlock-field-regex-begin end t)
-           (setq beg (or (match-end 0) beg))
-           (setq pt beg)
-           (goto-char beg)
-           gridlock-field-regex-end
-           (not (string-empty-p gridlock-field-regex-end))
-           (search-forward-regexp gridlock-field-regex-end end t)
-           (setq end (or (match-beginning 0) end))
-           ;; (message "pre: beg %d end %d" beg end)
-           (goto-char beg)
-           )
-      (while (search-forward-regexp gridlock-field-delimiter end t)
-        (setq str (buffer-substring-no-properties
-                   pt (match-beginning 0)))
-        ;; (message "during: pt is %d, end is %d, str is %s" pt end str)
-        (push (list (cons pt (match-beginning 0)) idx str) lst)
-        (setq idx (1+ idx))
-        (setq pt (point)))
-      (setq str (string-trim (buffer-substring-no-properties pt end)))
-      ;; (message "post: end pt is %d, end is %d, str is %s" pt end str)
-      (unless (string-empty-p str)
-        (push (list (cons pt (+ pt (length str))) idx str) lst))
-      (setq vec (make-vector (length lst) nil))
-      (dolist (elt (nreverse lst) vec)
-        (aset vec (gridlock-field-get-index elt) elt)))))
+    (save-match-data
+      (let ((pt beg)
+            (end (line-end-position))
+            (idx 0)
+            lst str vec)
+        (goto-char beg)
+        (and gridlock-field-regex-begin
+             (not (string-empty-p gridlock-field-regex-begin))
+             (search-forward-regexp gridlock-field-regex-begin end t)
+             (setq beg (or (match-end 0) beg))
+             (setq pt beg)
+             (goto-char beg)
+             gridlock-field-regex-end
+             (not (string-empty-p gridlock-field-regex-end))
+             (search-forward-regexp gridlock-field-regex-end end t)
+             (setq end (or (match-beginning 0) end))
+             ;; (message "pre: beg %d end %d" beg end)
+             (goto-char beg)
+             )
+        (while (search-forward-regexp gridlock-field-delimiter end t)
+          (setq str (buffer-substring-no-properties
+                     pt (match-beginning 0)))
+          ;; (message "during: pt is %d, end is %d, str is %s" pt end str)
+          (push (list (cons pt (match-beginning 0)) idx str) lst)
+          (setq idx (1+ idx))
+          (setq pt (point)))
+        (setq str (string-trim (buffer-substring-no-properties pt end)))
+        ;; (message "post: end pt is %d, end is %d, str is %s" pt end str)
+        (unless (string-empty-p str)
+          (push (list (cons pt (+ pt (length str))) idx str) lst))
+        (setq vec (make-vector (length lst) nil))
+        (dolist (elt (nreverse lst) vec)
+          (aset vec (gridlock-field-get-index elt) elt))))))
 
 (defun gridlock-field-get-bounds (field)
   "Given a record FIELD, return its bounds.
