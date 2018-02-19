@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-16 17:53:11 dharms>
+;; Modified Time-stamp: <2018-02-19 08:56:02 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -122,7 +122,7 @@ If nil, the entire string to the end of line will be used.")
          (fields (gridlock-get-fields-at anchor))
          (idx (gridlock--lookup-field-at-pos fields pt))
          beg)
-    (message "drh prev pt %d anchor %d idx %d" pt anchor idx)
+    ;; (message "drh prev pt %d anchor %d idx %d" pt anchor idx)
     (when anchor
       (setq pt anchor))
     (save-excursion
@@ -137,8 +137,43 @@ If nil, the entire string to the end of line will be used.")
             (setq fields (gridlock-get-fields-at beg))
             (if (< idx (length fields))
                 (car (gridlock-field-get-bounds (aref fields idx)))
-            beg))
+              beg))
         nil))))
+
+;;;###autoload
+(defun gridlock-goto-line-start ()
+  "Move point to the beginning of the first field, if any, on the current line."
+  (interactive)
+  (let ((pt (gridlock--find-first-field)))
+    (if pt (goto-char pt)
+      (message "No fields on current line."))))
+
+(defun gridlock--find-first-field ()
+  "Return location, if any, of first field on current line."
+  (let* ((pt (point))
+         (anchor (gridlock--find-anchor-on-line pt))
+         (fields (gridlock-get-fields-at anchor)))
+    (when (> (length fields) 0)
+      (car (gridlock-field-get-bounds
+            (aref fields 0))))))
+
+;;;###autoload
+(defun gridlock-goto-line-end ()
+  "Move point to the beginning of the last field, if any, on the current line."
+  (interactive)
+  (let ((pt (gridlock--find-last-field)))
+    (if pt (goto-char pt)
+      (message "No fields on current line."))))
+
+(defun gridlock--find-last-field ()
+  "Return location, if any, of last field on current line."
+  (let* ((pt (point))
+         (anchor (gridlock--find-anchor-on-line pt))
+         (fields (gridlock-get-fields-at anchor))
+         (len (length fields)))
+    (when (> len 0)
+      (car (gridlock-field-get-bounds
+            (aref fields (1- len)))))))
 
 ;;;###autoload
 (defun gridlock-goto-next-field ()
@@ -147,6 +182,7 @@ If nil, the entire string to the end of line will be used.")
   (let ((fld (gridlock-get-next-field (point))))
     (if fld
         (goto-char (car (gridlock-field-get-bounds fld)))
+      ;; todo allow wrap-around to next line
       (message "No further fields on this line."))))
 
 ;;;###autoload
@@ -162,8 +198,8 @@ If nil, the entire string to the end of line will be used.")
   "An anchor point has been found at position BEG on a line."
   (unless (ht-contains? gridlock-buffer-points beg)
     (ht-set! gridlock-buffer-points beg
-                 (save-match-data       ;todo needed?
-                   (gridlock--parse-line beg))))
+             (save-match-data       ;todo needed?
+               (gridlock--parse-line beg))))
   ;; maybe move this to the minor-mode activation?
   (unless gridlock-buffer-metadata
     (setq gridlock-buffer-metadata
@@ -292,6 +328,8 @@ This is a cons cell (BEG . END) of the field's bounds."
   (define-key map (kbd "<up>") 'gridlock-goto-prev-line)
   (define-key map (kbd "<left>") 'gridlock-goto-previous-field)
   (define-key map (kbd "<right>") 'gridlock-goto-next-field)
+  (define-key map "a" 'gridlock-goto-line-start)
+  (define-key map "e" 'gridlock-goto-line-end)
   (define-key map [t] 'gridlock-turn-off)
   )
 
