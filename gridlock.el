@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-14 17:17:06 dharms>
+;; Modified Time-stamp: <2018-02-16 17:53:11 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -88,16 +88,24 @@ If nil, the entire string to the end of line will be used.")
 
 (defun gridlock--find-next-line ()
   "Return location, if any, of next anchor point."
-  (let ((pt (point))
-        beg)
+  (let* ((pt (point))
+         (anchor (gridlock--find-anchor-on-line pt))
+         (fields (gridlock-get-fields-at anchor))
+         (idx (gridlock--lookup-field-at-pos fields pt))
+         beg)
     (save-excursion
       (setq beg (search-forward-regexp gridlock-anchor-regex nil t))
       (when (eq beg pt)
         (goto-char (1+ (point)))
         (setq beg (search-forward-regexp gridlock-anchor-regex nil t)))
-      (when beg
-        (gridlock--on-anchor-found beg)
-        beg))))
+      (if beg
+          (progn
+            (gridlock--on-anchor-found beg)
+            (setq fields (gridlock-get-fields-at beg))
+            (if (< idx (length fields))
+                (car (gridlock-field-get-bounds (aref fields idx)))
+              beg))
+        nil))))
 
 ;;;###autoload
 (defun gridlock-goto-prev-line ()
@@ -106,6 +114,31 @@ If nil, the entire string to the end of line will be used.")
   (let ((pt (gridlock--find-prev-line)))
     (if pt (goto-char pt)
       (message "No prior lines."))))
+
+(defun gridlock--find-prev-line ()
+  "Return location, if any, of prior anchor point."
+  (let* ((pt (point))
+         (anchor (gridlock--find-anchor-on-line pt))
+         (fields (gridlock-get-fields-at anchor))
+         (idx (gridlock--lookup-field-at-pos fields pt))
+         beg)
+    (message "drh prev pt %d anchor %d idx %d" pt anchor idx)
+    (when anchor
+      (setq pt anchor))
+    (save-excursion
+      (goto-char pt)
+      (setq beg (search-backward-regexp gridlock-anchor-regex nil t))
+      (when (eq beg pt)
+        (goto-char (1- (point)))
+        (setq beg (search-backward-regexp gridlock-anchor-regex nil t)))
+      (if beg
+          (progn
+            (gridlock--on-anchor-found beg)
+            (setq fields (gridlock-get-fields-at beg))
+            (if (< idx (length fields))
+                (car (gridlock-field-get-bounds (aref fields idx)))
+            beg))
+        nil))))
 
 ;;;###autoload
 (defun gridlock-goto-next-field ()
@@ -125,24 +158,11 @@ If nil, the entire string to the end of line will be used.")
         (goto-char (car (gridlock-field-get-bounds fld)))
       (message "No further fields on this line."))))
 
-(defun gridlock--find-prev-line ()
-  "Return location, if any, of prior anchor point."
-  (let ((pt (point))
-        beg)
-    (save-excursion
-      (setq beg (search-backward-regexp gridlock-anchor-regex nil t))
-      (when (eq beg pt)
-        (goto-char (1- (point)))
-        (setq beg (search-backward-regexp gridlock-anchor-regex nil t)))
-      (when beg
-        (gridlock--on-anchor-found beg)
-        beg))))
-
 (defun gridlock--on-anchor-found (beg)
   "An anchor point has been found at position BEG on a line."
   (unless (ht-contains? gridlock-buffer-points beg)
     (ht-set! gridlock-buffer-points beg
-                 (save-match-data
+                 (save-match-data       ;todo needed?
                    (gridlock--parse-line beg))))
   ;; maybe move this to the minor-mode activation?
   (unless gridlock-buffer-metadata
@@ -205,14 +225,14 @@ This is a cons cell (BEG . END) of the field's bounds."
 
 (defun gridlock-get-field-at (point)
   "Return the field, if any, that POINT lies on."
-  (let* ((fields (gridlock-get-fields-at point))
+  (let* ((anchor (gridlock--find-anchor-on-line point))
+         (fields (gridlock-get-fields-at anchor))
          (idx (gridlock--lookup-field-at-pos fields point)))
     (and idx (aref fields idx))))
 
-(defun gridlock-get-fields-at (point)
-  "Return the fields, if any, existing on line containing POINT."
-  (let ((anchor (gridlock--find-anchor-on-line point)))
-    (ht-get gridlock-buffer-points anchor)))
+(defun gridlock-get-fields-at (anchor)
+  "Return the fields, if any, existing on line associated with ANCHOR.."
+  (ht-get gridlock-buffer-points anchor))
 
 (defun gridlock--lookup-field-at-pos (fields pt)
   "Lookup in field list FIELDS what field, if any, PT is within."
@@ -232,23 +252,23 @@ This is a cons cell (BEG . END) of the field's bounds."
 
 (defun gridlock-get-previous-field (point)
   "Return the field, if any, that precedes that at POINT."
-  (let* ((fields (gridlock-get-fields-at point))
+  (let* ((anchor (gridlock--find-anchor-on-line point))
+         (fields (gridlock-get-fields-at anchor))
          (idx (gridlock--lookup-field-at-pos fields point))
          prev)
     (and idx
          (setq prev (gridlock--get-previous-field fields idx))
-         prev
          (aref fields prev))))
 
 (defun gridlock-get-next-field (point)
   "Return the field, if any, following that at POINT."
-  (let* ((fields (gridlock-get-fields-at point))
+  (let* ((anchor (gridlock--find-anchor-on-line point))
+         (fields (gridlock-get-fields-at anchor))
          (idx (gridlock--lookup-field-at-pos fields point))
-         prev)
+         next)
     (and idx
-         (setq prev (gridlock--get-next-field fields idx))
-         prev
-         (aref fields prev))))
+         (setq next (gridlock--get-next-field fields idx))
+         (aref fields next))))
 
 (defun gridlock--get-next-field (fields idx)
   "Return the next field from FIELDS after IDX, if it exists."
@@ -257,9 +277,9 @@ This is a cons cell (BEG . END) of the field's bounds."
 
 (defun gridlock--get-previous-field (fields idx)
   "Return the previous field from FIELDS before IDX, if it exists."
-  (and (<= idx (length fields))
-       (> idx 0)
-       (1- idx)))
+  (when (and (<= idx (length fields))
+             (> idx 0))
+    (1- idx)))
 
 (defun gridlock--get-buffer-metadata ()
   "Get the metadata for the current buffer."
