@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-19 17:46:02 dharms>
+;; Modified Time-stamp: <2018-02-20 17:34:31 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -34,10 +34,6 @@
   "Helper to navigate between fields, and explicate them."
   :group 'tools
   :prefix "gridlock")
-
-(defcustom gridlock-prefix-key (kbd "C-c C-g")
-  "Prefix key for `gridlock-mode'."
-  :type 'vector)
 
 (defvar-local gridlock-buffer-points
   (ht-create 'eq)
@@ -346,15 +342,6 @@ This is a cons cell (BEG . END) of the field's bounds."
     map)
   "Keymap for `gridlock-mode'.")
 
-(defun gridlock-define-prefix (map)
-  "Define a prefix kepmap for `gridlock-mode' inside keymap MAP."
-  (define-key map gridlock-prefix-key gridlock-mode-map))
-
-(defvar gridlock-prefix-map
-  (let ((map (make-sparse-keymap)))
-    (gridlock-define-prefix map)
-    map)
-  "Prefix keymap for `gridlock-mode'.")
 
 (defun gridlock-turn-off ()
   "Turn off `gridlock-mode'."
