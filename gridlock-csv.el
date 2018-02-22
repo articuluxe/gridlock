@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Tuesday, February 20, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-02-21 06:24:23 dharms>
+;; Modified Time-stamp: <2018-02-22 17:34:42 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -28,6 +28,38 @@
 
 ;;; Code:
 (require 'gridlock)
+
+(defvar-local gridlock-csv-metadata nil
+  "The metadata for this csv buffer.")
+
+(defun gridlock-csv--get-buffer-metadata ()
+  "Get the metadata for the current buffer."
+  (let ((i 0)
+        anchor fields len)
+    (gridlock-csv--reset-metadata)
+    (save-excursion
+      (goto-char (point-min))
+      (and (setq anchor (search-forward-regexp gridlock-anchor-regex (line-end-position) t))
+           (setq fields (gridlock--check-anchor anchor))
+           (setq len (length fields))
+           (setq gridlock-csv-metadata
+                 (make-vector len ""))
+           (while (< i len)
+             (aset gridlock-csv-metadata i (gridlock-field-get-str (aref fields i)))
+             (setq i (1+ i)))))))
+
+(defun gridlock-csv--reset-metadata ()
+  "Reset metadata associated with current buffer."
+  (setq gridlock-csv-metadata nil)
+  )
+
+(defun gridlock-csv-get-title (field)
+  "Return the title associated with FIELD."
+  (let ((idx (gridlock-field-get-index field))
+        (len (length gridlock-csv-metadata)))
+    (if (>= idx len)
+        (format "Heading %d" idx)
+      (aref gridlock-csv-metadata idx))))
 
 (defvar gridlock-csv-mode-map
   (let ((map gridlock-mode-map))
@@ -57,7 +89,9 @@
         (setq gridlock-field-delimiter ",")
         (setq gridlock-field-regex-begin nil)
         (setq gridlock-field-regex-end nil)
-        (gridlock-csv-reset))
+        (setq gridlock-field-get-title-func #'gridlock-csv-get-title)
+        (gridlock-csv-reset)
+        (gridlock-csv--get-buffer-metadata))
     t))
 
 (provide 'gridlock-csv)

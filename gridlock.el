@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-22 08:16:57 dharms>
+;; Modified Time-stamp: <2018-02-22 17:39:15 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -65,12 +65,6 @@ If nil, the entire string to the end of line will be used.")
   "Reset gridlock state in current buffer."
   (interactive)
   (ht-clear! gridlock-buffer-points))
-
-(defun gridlock-reset-metadata ()
-  "Reset metadata associated with current buffer."
-  (interactive)
-  ;; todo
-  )
 
 ;;;###autoload
 (defun gridlock-goto-next-line ()
@@ -253,10 +247,13 @@ This is a cons cell (BEG . END) of the field's bounds."
   "Given a record FIELD, return its string value."
   (nth 2 field))
 
+(defvar gridlock-field-get-title-func nil
+  "Given a record FIELD, return its grid's title.
+Function takes one parameter, field.")
+
 (defun gridlock-field-get-title (field)
   "Given a record FIELD, return its grid's title."
-  ;; todo access metadata
-  nil)
+  (funcall gridlock-field-get-title-func field))
 
 (defun gridlock-get-field-at (point)
   "Return the field, if any, that POINT lies on."
@@ -315,11 +312,6 @@ This is a cons cell (BEG . END) of the field's bounds."
   (when (and (<= idx (length fields))
              (> idx 0))
     (1- idx)))
-
-(defun gridlock--get-buffer-metadata ()
-  "Get the metadata for the current buffer."
-  ;; todo
-  nil)
 
 (defun gridlock-define-keys (map)
   "Define in keymap MAP bindings for `gridlock-mode'."
