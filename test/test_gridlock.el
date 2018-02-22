@@ -5,7 +5,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, February  2, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-02-19 08:29:20 dharms>
+;; Modified Time-stamp: <2018-02-22 08:17:22 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: test gridlock
 
@@ -28,14 +28,14 @@
 
 ;;; Code:
 (load-file "test/gridlock-test-common.el")
-(require 'gridlock)
+(require 'gridlock-csv)
 
 (ert-deftest gridlock-test-search-forward ()
   "Test basic parsing and searching forward."
   (let (field)
     (with-temp-buffer
       (insert "One,Two,Three,\n1,2,3\n4,5,6")
-      (gridlock-mode 1)
+      (gridlock-csv-mode)
       ;; search forward from beginning
       (goto-char 1)
       (should (looking-at "One"))
@@ -66,47 +66,56 @@
 
 (ert-deftest gridlock-test-search-backward ()
   "Test basic parsing and searching backward."
-  (let (field)
+  (let (anchor fields field)
     (with-temp-buffer
       (insert "One,Two,Three,\n1,2,3\n4,5,6")
-      (gridlock-mode 1)
+      (gridlock-csv-mode)
       ;; search backward
-      (goto-char 22)
-      (should (looking-at "4"))
+      (goto-char 24)
+      (should (looking-at "5"))
       (gridlock-goto-prev-line)
-      (should (looking-at "1"))
-
-      (setq field (aref (ht-get gridlock-buffer-points (point)) 0))
+      (should (looking-at "2"))
+      (setq anchor (gridlock--find-anchor-on-line (point)))
+      (setq fields (gridlock-get-fields-at anchor))
+      (should (eq (length fields) 3))
+      ;; field 1
+      (setq field (aref fields 0))
+      (should (eq (gridlock-field-get-index field) 0))
+      (should (string= (gridlock-field-get-str field) "1"))
+      ;; (goto-char (car (gridlock-field-get-bounds field)))
+      ;; (should (looking-at ","))
       (should (equal (gridlock-field-get-bounds field)
                      '(16 . 17)))
       (should (eq (gridlock-field-get-index field) 0))
       (should (string= (gridlock-field-get-str field) "1"))
-      (setq field (aref (ht-get gridlock-buffer-points (point)) 1))
+      ;; field 2
+      (setq field (aref fields 1))
       (should (equal (gridlock-field-get-bounds field)
                      '(18 . 19)))
       (should (eq (gridlock-field-get-index field) 1))
       (should (string= (gridlock-field-get-str field) "2"))
-      (setq field (aref (ht-get gridlock-buffer-points (point)) 2))
+      ;; field 3
+      (setq field (aref fields 2))
       (should (equal (gridlock-field-get-bounds field)
                      '(20 . 21)))
       (should (eq (gridlock-field-get-index field) 2))
       (should (string= (gridlock-field-get-str field) "3"))
 
       ;; search backward from middle of field
-      (goto-char 24)
-      (should (looking-at "5"))
+      (goto-char 26)
+      (should (looking-at "6"))
       (gridlock-goto-prev-line)
-      (should (looking-at "2"))
+      (should (looking-at "3"))
       )))
 
 (ert-deftest gridlock-test-parse-delimited-fields ()
   "Test parsing delimited fields."
-  (let ((gridlock-field-regex-begin "#")
-        (gridlock-field-regex-end "@")
-        anchor field)
+  (let (anchor field)
     (with-temp-buffer
       (insert "One,Two,Three\n,,#1,2,3,\n#4,5,6\n,,,#7,8,9@,,,")
-      (gridlock-mode 1)
+      (gridlock-csv-mode)
+      (setq gridlock-field-regex-begin "#")
+      (setq gridlock-field-regex-end "@")
       (goto-char 1)
       (should (looking-at "One"))
 
@@ -167,13 +176,12 @@
 
 (ert-deftest gridlock-test-field-navigation ()
   "Test navigating between fields."
-  (let ((gridlock-field-regex-begin "#")
-        (gridlock-field-regex-end "@")
-        pt anchor field fields)
+  (let (pt anchor field fields)
     (with-temp-buffer
       (insert "One,Two,Three,\n#1,2,3@,o,\n4,5,6")
-      (gridlock-mode 1)
-      ;; look up from 1st field
+      (gridlock-csv-mode)
+      (setq gridlock-field-regex-begin "#")
+      (setq gridlock-field-regex-end "@")      ;; look up from 1st field
       (setq pt 17)
       (goto-char pt)
       (should (looking-at "1"))

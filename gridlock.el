@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-20 17:34:31 dharms>
+;; Modified Time-stamp: <2018-02-22 08:16:57 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -49,9 +49,6 @@ If nil, the entire string from the anchor point will be used.")
 (defvar gridlock-field-regex-end nil
   "Regexp to delimit the end of the fields to be scanned per line.
 If nil, the entire string to the end of line will be used.")
-
-(defvar-local gridlock-buffer-metadata nil
-  "Stores metadata about a cell.")
 
 (defun gridlock--find-anchor-on-line (pt)
   "Find location, if any, of anchor point on line containing PT."
@@ -202,10 +199,8 @@ If none, return nil.  If some, return those fields."
   "Mark that anchor point ANCHOR is associated with FIELDS."
   (unless (ht-contains? gridlock-buffer-points anchor)
     (ht-set! gridlock-buffer-points anchor fields))
-  ;; maybe move this to the minor-mode activation?
-  (unless gridlock-buffer-metadata
-    (setq gridlock-buffer-metadata
-          (gridlock--get-buffer-metadata))))
+  ;; todo metadata
+  )
 
 (defun gridlock--parse-line (beg)
   "Parse the format of the line beginning at BEG."
@@ -232,7 +227,7 @@ If none, return nil.  If some, return those fields."
         (while (search-forward-regexp gridlock-field-delimiter end t)
           (setq str (buffer-substring-no-properties
                      pt (match-beginning 0)))
-          ;; (message "during: pt is %d, end is %d, str is %s" pt end str)
+          ;; (message "during: bounds: (%d,%d) end is %d, str is %s" pt (match-beginning 0) end str)
           (push (list (cons pt (match-beginning 0)) idx str) lst)
           (setq idx (1+ idx))
           (setq pt (point)))
@@ -242,7 +237,8 @@ If none, return nil.  If some, return those fields."
           (push (list (cons pt (+ pt (length str))) idx str) lst))
         (setq vec (make-vector (length lst) nil))
         (dolist (elt (nreverse lst) vec)
-          (aset vec (gridlock-field-get-index elt) elt))))))
+          (aset vec (gridlock-field-get-index elt) elt)
+          )))))
 
 (defun gridlock-field-get-bounds (field)
   "Given a record FIELD, return its bounds.
@@ -333,7 +329,6 @@ This is a cons cell (BEG . END) of the field's bounds."
   (define-key map (kbd "<right>") 'gridlock-goto-next-field)
   (define-key map "a" 'gridlock-goto-line-start)
   (define-key map "e" 'gridlock-goto-line-end)
-  (define-key map [t] 'gridlock-turn-off)
   )
 
 (defvar gridlock-mode-map
@@ -341,23 +336,6 @@ This is a cons cell (BEG . END) of the field's bounds."
     (gridlock-define-keys map)
     map)
   "Keymap for `gridlock-mode'.")
-
-
-(defun gridlock-turn-off ()
-  "Turn off `gridlock-mode'."
-  (interactive)
-  (gridlock-mode -1))
-
-(define-minor-mode gridlock-mode
-  "Navigate between and explicate fields."
-  :init-value nil
-  :lighter " GRID"
-  :keymap gridlock-mode-map
-  (if gridlock-mode
-      (progn
-        (gridlock-define-prefix global-map)
-        (gridlock-reset))
-    t))
 
 (provide 'gridlock)
 ;;; gridlock.el ends here
