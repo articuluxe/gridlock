@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Tuesday, February 20, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-02-22 17:34:42 dharms>
+;; Modified Time-stamp: <2018-02-22 17:47:54 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -35,6 +35,7 @@
 (defun gridlock-csv--get-buffer-metadata ()
   "Get the metadata for the current buffer."
   (let ((i 0)
+        (gridlock-field-regex-begin "#")
         anchor fields len)
     (gridlock-csv--reset-metadata)
     (save-excursion

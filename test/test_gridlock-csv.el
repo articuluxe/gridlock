@@ -5,7 +5,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Thursday, February 22, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-02-22 17:36:34 dharms>
+;; Modified Time-stamp: <2018-02-22 17:48:45 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: test gridlock
 
@@ -30,25 +30,33 @@
 (load-file "test/gridlock-test-common.el")
 (require 'gridlock-csv)
 
-(ert-deftest gridlock-csv-test-metadata ()
-  "Test gridlock-csv metadata."
+(defun test-gridlock-csv-metadata-helper (buffer vec)
+  "Helper function to test metadata parsing."
   (let (anchor fields)
     (with-temp-buffer
-      (insert "One,Two,Three\n1,2,3\n4,5,6")
+      (insert buffer)
       (gridlock-csv-mode)
-      (goto-char 17)
-      (should (looking-at "2"))
+      (search-forward-regexp "\n" nil t)
+      (search-forward-regexp "\n" nil t)
+      ;; move to the second line, before the end
+      (goto-char (1- (match-beginning 0)))
       (setq anchor (gridlock--find-anchor-on-line (point)))
       (setq fields (gridlock-get-fields-at anchor))
       (should (eq (length fields) 3))
-      ;; field 1
       (should (string= (gridlock-field-get-title (aref fields 0))
-                       "One"))
+                       (aref vec 0)))
       (should (string= (gridlock-field-get-title (aref fields 1))
-                       "Two"))
+                       (aref vec 1)))
       (should (string= (gridlock-field-get-title (aref fields 2))
-                       "Three"))
+                       (aref vec 2)))
       )))
+
+
+(ert-deftest gridlock-csv-test-metadata ()
+  "Test gridlock-csv metadata."
+  (test-gridlock-csv-metadata-helper "One,Two,Three\n1,2,3\n4,5,6" ["One" "Two" "Three"])
+  (test-gridlock-csv-metadata-helper "#One,Two,Three\n1,2,3\n4,5,6" ["One" "Two" "Three"])
+  )
 
 (ert-run-tests-batch-and-exit (car argv))
 ;;; test_gridlock-csv.el ends here
