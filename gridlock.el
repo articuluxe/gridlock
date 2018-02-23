@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-22 17:39:15 dharms>
+;; Modified Time-stamp: <2018-02-23 17:28:55 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -50,6 +50,25 @@ If nil, the entire string from the anchor point will be used.")
   "Regexp to delimit the end of the fields to be scanned per line.
 If nil, the entire string to the end of line will be used.")
 
+(defvar gridlock-display-schemes '(echo . gridlock-display-echo)
+  "List of display schemes capable of being used by `gridlock-mode'.")
+
+(defvar gridlock-display-func #'gridlock-display-echo)
+
+(defun gridlock-display-echo (str)
+  "Show STR (the gridlock cell's title) to the user via the minibuffer."
+  (message str))
+
+(defvar-local gridlock-current-field nil "The current field.")
+
+;;;###autoload
+(defun gridlock-show-title ()
+  "Show the current field."
+  (interactive)
+  (when gridlock-current-field
+    (funcall gridlock-display-func
+             (gridlock-field-get-title gridlock-current-field))))
+
 (defun gridlock--find-anchor-on-line (pt)
   "Find location, if any, of anchor point on line containing PT."
   (let (anchor fields)
@@ -64,14 +83,18 @@ If nil, the entire string to the end of line will be used.")
 (defun gridlock-reset ()
   "Reset gridlock state in current buffer."
   (interactive)
-  (ht-clear! gridlock-buffer-points))
+  (ht-clear! gridlock-buffer-points)
+  (setq gridlock-current-field nil))
 
 ;;;###autoload
 (defun gridlock-goto-next-line ()
   "Advance point to next anchor point."
   (interactive)
   (let ((pt (gridlock--find-next-line)))
-    (if pt (goto-char pt)
+    (if pt
+        (progn
+          (goto-char pt)
+          (gridlock-show-title))
       (message "No further lines."))))
 
 (defun gridlock--find-next-line ()
@@ -86,22 +109,26 @@ If nil, the entire string to the end of line will be used.")
       (when (eq beg pt)
         (goto-char (1+ (point)))
         (setq beg (search-forward-regexp gridlock-anchor-regex nil t)))
-      (if beg
-          (progn
-            (and
-             (setq fields (gridlock--check-anchor beg))
-             (gridlock--on-anchor-found beg fields))
-            (if (and idx (< idx (length fields)))
-                (car (gridlock-field-get-bounds (aref fields idx)))
-              beg))
-        nil))))
+      (catch 'found
+        (while beg
+          (if (setq fields (gridlock--check-anchor beg))
+              (progn
+                (gridlock--on-anchor-found beg fields)
+                (setq idx (if (and idx (< idx (length fields))) idx 0))
+                (setq gridlock-current-field (aref fields idx))
+                (throw 'found (car (gridlock-field-get-bounds gridlock-current-field))))
+            (goto-char (1+ beg))
+            (setq beg (search-forward-regexp gridlock-anchor-regex nil t))))))))
 
 ;;;###autoload
 (defun gridlock-goto-prev-line ()
   "Advance point to prior anchor point."
   (interactive)
   (let ((pt (gridlock--find-prev-line)))
-    (if pt (goto-char pt)
+    (if pt
+        (progn
+          (goto-char pt)
+          (gridlock-show-title))
       (message "No prior lines."))))
 
 (defun gridlock--find-prev-line ()
@@ -120,21 +147,26 @@ If nil, the entire string to the end of line will be used.")
       (when (eq beg pt)
         (goto-char (1- (point)))
         (setq beg (search-backward-regexp gridlock-anchor-regex nil t)))
-      (if beg
-          (progn
-            (when (setq fields (gridlock--check-anchor beg))
-                 (gridlock--on-anchor-found beg fields))
-            (if (and idx (< idx (length fields)))
-                (car (gridlock-field-get-bounds (aref fields idx)))
-              beg))
-        nil))))
+      (catch 'found
+        (while beg
+          (if (setq fields (gridlock--check-anchor beg))
+              (progn
+                (gridlock--on-anchor-found beg fields)
+                (setq idx (if (and idx (< idx (length fields))) idx 0))
+                (setq gridlock-current-field (aref fields idx))
+                (throw 'found (car (gridlock-field-get-bounds gridlock-current-field))))
+            (goto-char (1- beg))
+            (setq beg (search-backward-regexp gridlock-anchor-regex nil t))))))))
 
 ;;;###autoload
 (defun gridlock-goto-line-start ()
   "Move point to the beginning of the first field, if any, on the current line."
   (interactive)
   (let ((pt (gridlock--find-first-field)))
-    (if pt (goto-char pt)
+    (if pt
+        (progn
+          (goto-char pt)
+          (gridlock-show-title))
       (message "No fields on current line."))))
 
 (defun gridlock--find-first-field ()
@@ -143,15 +175,18 @@ If nil, the entire string to the end of line will be used.")
          (anchor (gridlock--find-anchor-on-line pt))
          (fields (gridlock-get-fields-at anchor)))
     (when (> (length fields) 0)
-      (car (gridlock-field-get-bounds
-            (aref fields 0))))))
+      (setq gridlock-current-field (aref fields 0))
+      (car (gridlock-field-get-bounds gridlock-current-field)))))
 
 ;;;###autoload
 (defun gridlock-goto-line-end ()
   "Move point to the beginning of the last field, if any, on the current line."
   (interactive)
   (let ((pt (gridlock--find-last-field)))
-    (if pt (goto-char pt)
+    (if pt
+        (progn
+          (goto-char pt)
+          (gridlock-show-title))
       (message "No fields on current line."))))
 
 (defun gridlock--find-last-field ()
@@ -161,8 +196,8 @@ If nil, the entire string to the end of line will be used.")
          (fields (gridlock-get-fields-at anchor))
          (len (length fields)))
     (when (> len 0)
-      (car (gridlock-field-get-bounds
-            (aref fields (1- len)))))))
+      (setq gridlock-current-field (aref fields (1- len)))
+      (car (gridlock-field-get-bounds gridlock-current-field)))))
 
 ;;;###autoload
 (defun gridlock-goto-next-field ()
@@ -170,7 +205,10 @@ If nil, the entire string to the end of line will be used.")
   (interactive)
   (let ((fld (gridlock-get-next-field (point))))
     (if fld
-        (goto-char (car (gridlock-field-get-bounds fld)))
+        (progn
+          (setq gridlock-current-field fld)
+          (goto-char (car (gridlock-field-get-bounds fld)))
+          (gridlock-show-title))
       ;; todo allow wrap-around to next line
       (message "No further fields on this line."))))
 
@@ -180,7 +218,10 @@ If nil, the entire string to the end of line will be used.")
   (interactive)
   (let ((fld (gridlock-get-previous-field (point))))
     (if fld
-        (goto-char (car (gridlock-field-get-bounds fld)))
+        (progn
+          (setq gridlock-current-field fld)
+          (goto-char (car (gridlock-field-get-bounds fld)))
+          (gridlock-show-title))
       (message "No further fields on this line."))))
 
 (defun gridlock--check-anchor (anchor)
@@ -321,6 +362,7 @@ Function takes one parameter, field.")
   (define-key map (kbd "<right>") 'gridlock-goto-next-field)
   (define-key map "a" 'gridlock-goto-line-start)
   (define-key map "e" 'gridlock-goto-line-end)
+  (define-key map (kbd "SPC") 'gridlock-show-title)
   )
 
 (defvar gridlock-mode-map
