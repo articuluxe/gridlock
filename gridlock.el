@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-26 08:29:39 dharms>
+;; Modified Time-stamp: <2018-02-26 08:34:10 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -68,13 +68,13 @@ If nil, the entire string to the end of line will be used.")
 (defvar-local gridlock-current-field nil "The current field.")
 
 ;;;###autoload
-(defun gridlock-show-title ()
-  "Show the current field."
+(defun gridlock-show-title (field)
+  "Show info about the field FIELD."
   (interactive)
-  (when gridlock-current-field
-    (and gridlock-display-on-func
-         (funcall gridlock-display-on-func
-                  (gridlock-field-get-title gridlock-current-field)))))
+  (and field
+       gridlock-display-on-func
+       (funcall gridlock-display-on-func
+                (gridlock-field-get-title field))))
 
 ;;;###autoload
 (defun gridlock-hide-title ()
@@ -108,7 +108,7 @@ If nil, the entire string to the end of line will be used.")
     (if pt
         (progn
           (goto-char pt)
-          (gridlock-show-title))
+          (gridlock-show-title gridlock-current-field))
       (message "No further lines."))))
 
 (defun gridlock--find-next-line ()
@@ -142,7 +142,7 @@ If nil, the entire string to the end of line will be used.")
     (if pt
         (progn
           (goto-char pt)
-          (gridlock-show-title))
+          (gridlock-show-title gridlock-current-field))
       (message "No prior lines."))))
 
 (defun gridlock--find-prev-line ()
@@ -180,7 +180,7 @@ If nil, the entire string to the end of line will be used.")
     (if pt
         (progn
           (goto-char pt)
-          (gridlock-show-title))
+          (gridlock-show-title gridlock-current-field))
       (message "No fields on current line."))))
 
 (defun gridlock--find-first-field ()
@@ -200,7 +200,7 @@ If nil, the entire string to the end of line will be used.")
     (if pt
         (progn
           (goto-char pt)
-          (gridlock-show-title))
+          (gridlock-show-title gridlock-current-field))
       (message "No fields on current line."))))
 
 (defun gridlock--find-last-field ()
@@ -222,7 +222,7 @@ If nil, the entire string to the end of line will be used.")
         (progn
           (setq gridlock-current-field fld)
           (goto-char (car (gridlock-field-get-bounds fld)))
-          (gridlock-show-title))
+          (gridlock-show-title gridlock-current-field))
       ;; todo allow wrap-around to next line
       (message "No further fields on this line."))))
 
@@ -235,7 +235,7 @@ If nil, the entire string to the end of line will be used.")
         (progn
           (setq gridlock-current-field fld)
           (goto-char (car (gridlock-field-get-bounds fld)))
-          (gridlock-show-title))
+          (gridlock-show-title gridlock-current-field))
       (message "No further fields on this line."))))
 
 (defun gridlock--check-anchor (anchor)
