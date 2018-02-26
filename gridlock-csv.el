@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Tuesday, February 20, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-02-26 17:42:07 dharms>
+;; Modified Time-stamp: <2018-02-26 17:50:52 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -92,6 +92,7 @@
         (setq gridlock-field-get-title-func #'gridlock-csv-get-title)
         (gridlock-csv-reset)
         (gridlock-csv--get-buffer-metadata)
+        (gridlock-turn-echo-on)              ;temporary
         )
     t))
 

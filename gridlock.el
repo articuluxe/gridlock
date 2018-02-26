@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-26 17:30:41 dharms>
+;; Modified Time-stamp: <2018-02-26 17:47:08 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -29,6 +29,7 @@
 ;;; Code:
 (require 'subr-x)
 (require 'ht)
+(require 'gridlock-echo)
 
 (defgroup gridlock nil
   "Helper to navigate between fields, and explicate them."
@@ -54,16 +55,8 @@ If nil, the entire string to the end of line will be used.")
   '(echo . (gridlock-display-echo-on . gridlock-display-echo-off))
   "List of display schemes capable of being used by `gridlock-mode'.")
 
-(defvar gridlock-display-on-func #'gridlock-display-echo-on)
-(defvar gridlock-display-off-func #'gridlock-display-echo-off)
-
-(defun gridlock-display-echo-on (str)
-  "Show STR (the gridlock cell's title) to the user via the minibuffer."
-  (message str))
-
-(defun gridlock-display-echo-off ()
-  "Stop showing field info to the user."
-  nil)
+(defvar gridlock-display-on-func nil)
+(defvar gridlock-display-off-func nil)
 
 (defvar-local gridlock-current-field nil "The current field.")
 
