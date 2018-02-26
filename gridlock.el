@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-23 17:28:55 dharms>
+;; Modified Time-stamp: <2018-02-26 08:29:39 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -50,14 +50,20 @@ If nil, the entire string from the anchor point will be used.")
   "Regexp to delimit the end of the fields to be scanned per line.
 If nil, the entire string to the end of line will be used.")
 
-(defvar gridlock-display-schemes '(echo . gridlock-display-echo)
+(defvar gridlock-display-schemes
+  '(echo . (gridlock-display-echo-on . gridlock-display-echo-off))
   "List of display schemes capable of being used by `gridlock-mode'.")
 
-(defvar gridlock-display-func #'gridlock-display-echo)
+(defvar gridlock-display-on-func #'gridlock-display-echo-on)
+(defvar gridlock-display-off-func #'gridlock-display-echo-off)
 
-(defun gridlock-display-echo (str)
+(defun gridlock-display-echo-on (str)
   "Show STR (the gridlock cell's title) to the user via the minibuffer."
   (message str))
+
+(defun gridlock-display-echo-off ()
+  "Stop showing field info to the user."
+  nil)
 
 (defvar-local gridlock-current-field nil "The current field.")
 
@@ -66,8 +72,16 @@ If nil, the entire string to the end of line will be used.")
   "Show the current field."
   (interactive)
   (when gridlock-current-field
-    (funcall gridlock-display-func
-             (gridlock-field-get-title gridlock-current-field))))
+    (and gridlock-display-on-func
+         (funcall gridlock-display-on-func
+                  (gridlock-field-get-title gridlock-current-field)))))
+
+;;;###autoload
+(defun gridlock-hide-title ()
+  "Stop showing the current field."
+  (interactive)
+  (and gridlock-display-off-func
+   (funcall gridlock-display-off-func)))
 
 (defun gridlock--find-anchor-on-line (pt)
   "Find location, if any, of anchor point on line containing PT."
@@ -294,7 +308,8 @@ Function takes one parameter, field.")
 
 (defun gridlock-field-get-title (field)
   "Given a record FIELD, return its grid's title."
-  (funcall gridlock-field-get-title-func field))
+  (and gridlock-field-get-title-func
+       (funcall gridlock-field-get-title-func field)))
 
 (defun gridlock-get-field-at (point)
   "Return the field, if any, that POINT lies on."
