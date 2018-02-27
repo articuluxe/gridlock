@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-26 17:47:08 dharms>
+;; Modified Time-stamp: <2018-02-27 17:38:06 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -29,7 +29,12 @@
 ;;; Code:
 (require 'subr-x)
 (require 'ht)
+
+(defvar gridlock-display-schemes nil
+  "List of display schemes capable of being used by `gridlock-mode'.")
+
 (require 'gridlock-echo)
+(require 'gridlock-postip)
 
 (defgroup gridlock nil
   "Helper to navigate between fields, and explicate them."
@@ -51,12 +56,10 @@ If nil, the entire string from the anchor point will be used.")
   "Regexp to delimit the end of the fields to be scanned per line.
 If nil, the entire string to the end of line will be used.")
 
-(defvar gridlock-display-schemes
-  '(echo . (gridlock-display-echo-on . gridlock-display-echo-off))
-  "List of display schemes capable of being used by `gridlock-mode'.")
-
-(defvar gridlock-display-on-func nil)
-(defvar gridlock-display-off-func nil)
+(defvar gridlock-display-funcs (cons #'gridlock-echo-on #'gridlock-echo-off)
+  "A cons cell (on . off) to control display of the current cell.
+The car ON is a function that turns on display of the current
+cell, and the cadr off is a function that turns off that display.")
 
 (defvar-local gridlock-current-field nil "The current field.")
 
@@ -68,17 +71,28 @@ If nil, the entire string to the end of line will be used.")
 
 (defun gridlock--show-title-helper (field)
   "Show info about the field FIELD."
-  (and field
-       gridlock-display-on-func
-       (funcall gridlock-display-on-func
-                (gridlock-field-get-title field))))
+  (let ((func (car gridlock-display-funcs)))
+  (and field func
+       (funcall func (gridlock-field-get-title field)))))
 
 ;;;###autoload
 (defun gridlock-hide-title ()
   "Stop showing the current field."
   (interactive)
-  (and gridlock-display-off-func
-   (funcall gridlock-display-off-func)))
+  (let ((func (cadr gridlock-display-funcs)))
+  (and func
+       (funcall func))))
+
+;;;###autoload
+(defun gridlock-choose-display-scheme ()
+  "Choose a display scheme for `gridlock-mode' cells.
+The schemes are selected from `gridlock-display-schemes'."
+  (interactive)
+  (let* ((scheme (completing-read "Display scheme: " gridlock-display-schemes nil t))
+         (elt (assoc scheme gridlock-display-schemes)))
+    (when elt
+      (setq gridlock-display-funcs (cdr elt)))))
+
 
 (defun gridlock--find-anchor-on-line (pt)
   "Find location, if any, of anchor point on line containing PT."
@@ -375,13 +389,14 @@ Function takes one parameter, field.")
 
 (defun gridlock-define-keys (map)
   "Define in keymap MAP bindings for `gridlock-mode'."
-  (define-key map (kbd "<down>") 'gridlock-goto-next-line)
-  (define-key map (kbd "<up>") 'gridlock-goto-prev-line)
-  (define-key map (kbd "<left>") 'gridlock-goto-previous-field)
-  (define-key map (kbd "<right>") 'gridlock-goto-next-field)
-  (define-key map "a" 'gridlock-goto-line-start)
-  (define-key map "e" 'gridlock-goto-line-end)
-  (define-key map (kbd "SPC") 'gridlock-show-title)
+  (define-key map (kbd "<down>") #'gridlock-goto-next-line)
+  (define-key map (kbd "<up>") #'gridlock-goto-prev-line)
+  (define-key map (kbd "<left>") #'gridlock-goto-previous-field)
+  (define-key map (kbd "<right>") #'gridlock-goto-next-field)
+  (define-key map "a" #'gridlock-goto-line-start)
+  (define-key map "e" #'gridlock-goto-line-end)
+  (define-key map (kbd "SPC") #'gridlock-show-title)
+  (define-key map "`" #'gridlock-choose-display-scheme)
   )
 
 (defvar gridlock-mode-map

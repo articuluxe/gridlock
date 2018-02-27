@@ -1,9 +1,9 @@
-;;; gridlock-echo.el --- echo field info to minibuffer
+;;; gridlock-postip.el --- echo field info via pos-tip
 ;; Copyright (C) 2018  Dan Harms (dharms)
 ;; Author: Dan Harms <enniomore@icloud.com>
-;; Created: Monday, February 26, 2018
+;; Created: Tuesday, February 27, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-02-27 17:39:43 dharms>
+;; Modified Time-stamp: <2018-02-27 17:39:51 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools gridlock
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -23,20 +23,21 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;; Provide a minibuffer-based echo area for the current field.
+;; Provide a `pos-tip'-based display of the current gridlock field.
 ;;
 
 ;;; Code:
-(push (cons "echo" (cons #'gridlock-echo-on #'gridlock-echo-off))
-      gridlock-display-schemes)
+(when (require 'pos-tip nil t)
+  (push (cons "pos-tip" (cons #'gridlock-postip-on #'gridlock-postip-off))
+        gridlock-display-schemes))
 
-(defun gridlock-echo-on (str)
-  "Show STR (the gridlock cell's title) to the user via the minibuffer."
-  (message str))
+(defun gridlock-postip-on (str)
+  "Show STR (the gridlock cell's title) to the user via `pos-tip-show'."
+  (pos-tip-show str))
 
-(defun gridlock-echo-off ()
+(defun gridlock-postip-off ()
   "Stop showing field info to the user."
   nil)
 
-(provide 'gridlock-echo)
-;;; gridlock-echo.el ends here
+(provide 'gridlock-postip)
+;;; gridlock-postip.el ends here
