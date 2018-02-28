@@ -5,7 +5,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, February  2, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-02-22 08:17:22 dharms>
+;; Modified Time-stamp: <2018-02-28 08:52:56 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: test gridlock
 
@@ -36,6 +36,7 @@
     (with-temp-buffer
       (insert "One,Two,Three,\n1,2,3\n4,5,6")
       (gridlock-csv-mode)
+      (gridlock-activate-one-of-display-schemes '("echo"))
       ;; search forward from beginning
       (goto-char 1)
       (should (looking-at "One"))
@@ -70,6 +71,7 @@
     (with-temp-buffer
       (insert "One,Two,Three,\n1,2,3\n4,5,6")
       (gridlock-csv-mode)
+      (gridlock-activate-one-of-display-schemes '("echo"))
       ;; search backward
       (goto-char 24)
       (should (looking-at "5"))
@@ -114,6 +116,7 @@
     (with-temp-buffer
       (insert "One,Two,Three\n,,#1,2,3,\n#4,5,6\n,,,#7,8,9@,,,")
       (gridlock-csv-mode)
+      (gridlock-activate-one-of-display-schemes '("echo"))
       (setq gridlock-field-regex-begin "#")
       (setq gridlock-field-regex-end "@")
       (goto-char 1)
@@ -180,6 +183,7 @@
     (with-temp-buffer
       (insert "One,Two,Three,\n#1,2,3@,o,\n4,5,6")
       (gridlock-csv-mode)
+      (gridlock-activate-one-of-display-schemes '("echo"))
       (setq gridlock-field-regex-begin "#")
       (setq gridlock-field-regex-end "@")      ;; look up from 1st field
       (setq pt 17)

@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-28 08:31:57 dharms>
+;; Modified Time-stamp: <2018-02-28 08:35:48 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -29,6 +29,7 @@
 ;;; Code:
 (require 'subr-x)
 (require 'ht)
+(require 'seq)
 
 (defvar gridlock-display-schemes nil
   "List of display schemes capable of being used by `gridlock-mode'.")
@@ -57,7 +58,7 @@ If nil, the entire string from the anchor point will be used.")
   "Regexp to delimit the end of the fields to be scanned per line.
 If nil, the entire string to the end of line will be used.")
 
-(defvar gridlock-display-funcs (cons #'gridlock-echo-on #'gridlock-echo-off)
+(defvar gridlock-display-funcs nil
   "A cons cell (on . off) to control display of the current cell.
 The car ON is a function that turns on display of the current
 cell, and the cadr off is a function that turns off that display.")
@@ -89,11 +90,20 @@ cell, and the cadr off is a function that turns off that display.")
   "Choose a display scheme for `gridlock-mode' cells.
 The schemes are selected from `gridlock-display-schemes'."
   (interactive)
-  (let* ((scheme (completing-read "Display scheme: " gridlock-display-schemes nil t))
-         (elt (assoc scheme gridlock-display-schemes)))
+  (let ((scheme (completing-read "Display scheme: " gridlock-display-schemes nil t)))
+    (gridlock-activate-display-scheme scheme)
+    (gridlock-show-title)))
+
+(defun gridlock-activate-display-scheme (name)
+  "Activate the display scheme named by NAME."
+  (let ((elt (assoc name gridlock-display-schemes)))
     (when elt
       (setq gridlock-display-funcs (cdr elt)))))
 
+(defun gridlock-activate-one-of-display-schemes (lst)
+  "Iterate through LST trying to activate the named display schemes.
+LST is a list of display scheme names."
+  (seq-find #'gridlock-activate-display-scheme lst nil))
 
 (defun gridlock--find-anchor-on-line (pt)
   "Find location, if any, of anchor point on line containing PT."
