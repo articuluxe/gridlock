@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-27 17:44:47 dharms>
+;; Modified Time-stamp: <2018-02-28 08:31:57 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -121,7 +121,8 @@ The schemes are selected from `gridlock-display-schemes'."
         (progn
           (goto-char pt)
           (gridlock--show-title-helper gridlock-current-field))
-      (message "No further lines."))))
+      (message "No further lines.")
+      (gridlock-show-title))))
 
 (defun gridlock--find-next-line ()
   "Return location, if any, of next anchor point."
@@ -159,7 +160,8 @@ The schemes are selected from `gridlock-display-schemes'."
         (progn
           (goto-char pt)
           (gridlock--show-title-helper gridlock-current-field))
-      (message "No prior lines."))))
+      (message "No prior lines.")
+      (gridlock-show-title))))
 
 (defun gridlock--find-prev-line ()
   "Return location, if any, of prior anchor point."
@@ -243,7 +245,8 @@ The schemes are selected from `gridlock-display-schemes'."
           (goto-char (car (gridlock-field-get-bounds fld)))
           (gridlock--show-title-helper gridlock-current-field))
       ;; todo allow wrap-around to next line
-      (message "No further fields on this line."))))
+      (message "No further fields on this line.")
+      (gridlock-show-title))))
 
 ;;;###autoload
 (defun gridlock-goto-previous-field ()
@@ -255,7 +258,8 @@ The schemes are selected from `gridlock-display-schemes'."
           (setq gridlock-current-field fld)
           (goto-char (car (gridlock-field-get-bounds fld)))
           (gridlock--show-title-helper gridlock-current-field))
-      (message "No further fields on this line."))))
+      (message "No further fields on this line.")
+      (gridlock-show-title))))
 
 (defun gridlock--check-anchor (anchor)
   "Validate what fields can be parsed from anchor point ANCHOR.
