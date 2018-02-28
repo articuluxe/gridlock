@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Tuesday, February 27, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-02-27 17:39:51 dharms>
+;; Modified Time-stamp: <2018-02-28 08:40:35 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools gridlock
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -27,7 +27,8 @@
 ;;
 
 ;;; Code:
-(when (require 'pos-tip nil t)
+(when (and (require 'pos-tip nil t)
+           (display-graphic-p))
   (push (cons "pos-tip" (cons #'gridlock-postip-on #'gridlock-postip-off))
         gridlock-display-schemes))
 
