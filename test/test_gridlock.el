@@ -5,7 +5,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, February  2, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-02-28 08:52:56 dharms>
+;; Modified Time-stamp: <2018-02-28 17:31:28 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: test gridlock
 
@@ -33,10 +33,11 @@
 (ert-deftest gridlock-test-search-forward ()
   "Test basic parsing and searching forward."
   (let (field)
+    (cl-letf (((symbol-function 'gridlock--show-title-helper)
+               (lambda(_))))
     (with-temp-buffer
       (insert "One,Two,Three,\n1,2,3\n4,5,6")
       (gridlock-csv-mode)
-      (gridlock-activate-one-of-display-schemes '("echo"))
       ;; search forward from beginning
       (goto-char 1)
       (should (looking-at "One"))
@@ -63,15 +64,16 @@
       (should (looking-at "Two"))
       (gridlock-goto-next-line)
       (should (looking-at "2"))
-      )))
+      ))))
 
 (ert-deftest gridlock-test-search-backward ()
   "Test basic parsing and searching backward."
   (let (anchor fields field)
+    (cl-letf (((symbol-function 'gridlock--show-title-helper)
+               (lambda(_))))
     (with-temp-buffer
       (insert "One,Two,Three,\n1,2,3\n4,5,6")
       (gridlock-csv-mode)
-      (gridlock-activate-one-of-display-schemes '("echo"))
       ;; search backward
       (goto-char 24)
       (should (looking-at "5"))
@@ -108,15 +110,16 @@
       (should (looking-at "6"))
       (gridlock-goto-prev-line)
       (should (looking-at "3"))
-      )))
+      ))))
 
 (ert-deftest gridlock-test-parse-delimited-fields ()
   "Test parsing delimited fields."
   (let (anchor field)
+    (cl-letf (((symbol-function 'gridlock--show-title-helper)
+               (lambda(_))))
     (with-temp-buffer
       (insert "One,Two,Three\n,,#1,2,3,\n#4,5,6\n,,,#7,8,9@,,,")
       (gridlock-csv-mode)
-      (gridlock-activate-one-of-display-schemes '("echo"))
       (setq gridlock-field-regex-begin "#")
       (setq gridlock-field-regex-end "@")
       (goto-char 1)
@@ -175,15 +178,16 @@
                      '(40 . 41)))
       (should (eq (gridlock-field-get-index field) 2))
       (should (string= (gridlock-field-get-str field) "9"))
-      )))
+      ))))
 
 (ert-deftest gridlock-test-field-navigation ()
   "Test navigating between fields."
   (let (pt anchor field fields)
+    (cl-letf (((symbol-function 'gridlock--show-title-helper)
+               (lambda(_))))
     (with-temp-buffer
       (insert "One,Two,Three,\n#1,2,3@,o,\n4,5,6")
       (gridlock-csv-mode)
-      (gridlock-activate-one-of-display-schemes '("echo"))
       (setq gridlock-field-regex-begin "#")
       (setq gridlock-field-regex-end "@")      ;; look up from 1st field
       (setq pt 17)
@@ -242,7 +246,7 @@
       (should (not (gridlock-get-field-at pt)))
       (should (not (gridlock-get-previous-field pt)))
       (should (not (gridlock-get-next-field pt)))
-      )))
+      ))))
 
 
 (ert-run-tests-batch-and-exit (car argv))
