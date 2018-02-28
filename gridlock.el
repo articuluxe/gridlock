@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-28 17:31:48 dharms>
+;; Modified Time-stamp: <2018-02-28 17:33:05 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -74,16 +74,16 @@ cell, and the cadr off is a function that turns off that display.")
 (defun gridlock--show-title-helper (field)
   "Show info about the field FIELD."
   (let ((func (car gridlock-display-funcs)))
-  (and field func
-       (funcall func (gridlock-field-get-title field)))))
+    (and field func
+         (funcall func (gridlock-field-get-title field)))))
 
 ;;;###autoload
 (defun gridlock-hide-title ()
   "Stop showing the current field."
   (interactive)
   (let ((func (cadr gridlock-display-funcs)))
-  (and func
-       (funcall func))))
+    (and func
+         (funcall func))))
 
 ;;;###autoload
 (defun gridlock-choose-display-scheme ()
