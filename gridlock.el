@@ -37,6 +37,7 @@
 (require 'gridlock-echo)
 (require 'gridlock-postip)
 (require 'gridlock-popup)
+(require 'gridlock-quickpeek)
 
 (defgroup gridlock nil
   "Helper to navigate between fields, and explicate them."
