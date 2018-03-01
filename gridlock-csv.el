@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Tuesday, February 20, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-02-28 17:40:14 dharms>
+;; Modified Time-stamp: <2018-03-01 08:36:46 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -95,7 +95,7 @@
         (gridlock-activate-one-of-display-schemes
          '("popup" "pos-tip" "quick-peek" "echo"))
         )
-    t))
+    (gridlock-csv-reset)))
 
 (provide 'gridlock-csv)
 ;;; gridlock-csv.el ends here

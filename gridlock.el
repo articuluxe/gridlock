@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-03-01 08:30:25 dharms>
+;; Modified Time-stamp: <2018-03-01 08:35:08 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -126,6 +126,7 @@ LST is a list of display scheme names."
 (defun gridlock-reset ()
   "Reset gridlock state in current buffer."
   (interactive)
+  (gridlock--hide-title-helper gridlock-current-field)
   (ht-clear! gridlock-buffer-points)
   (setq gridlock-current-field nil))
 
