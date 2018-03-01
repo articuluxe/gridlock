@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-03-01 08:35:08 dharms>
+;; Modified Time-stamp: <2018-03-01 08:51:14 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -425,9 +425,13 @@ Function takes one parameter, field.")
 (defun gridlock-define-keys (map)
   "Define in keymap MAP bindings for `gridlock-mode'."
   (define-key map (kbd "<down>") #'gridlock-goto-next-line)
+  (define-key map (kbd "n") #'gridlock-goto-next-line)
   (define-key map (kbd "<up>") #'gridlock-goto-prev-line)
+  (define-key map (kbd "p") #'gridlock-goto-prev-line)
   (define-key map (kbd "<left>") #'gridlock-goto-previous-field)
+  (define-key map (kbd "b") #'gridlock-goto-previous-field)
   (define-key map (kbd "<right>") #'gridlock-goto-next-field)
+  (define-key map (kbd "f") #'gridlock-goto-next-field)
   (define-key map "a" #'gridlock-goto-line-start)
   (define-key map "e" #'gridlock-goto-line-end)
   (define-key map (kbd "SPC") #'gridlock-show-title)
