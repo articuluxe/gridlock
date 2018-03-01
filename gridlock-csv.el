@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Tuesday, February 20, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-03-01 08:53:47 dharms>
+;; Modified Time-stamp: <2018-03-01 17:44:06 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -99,7 +99,7 @@ Display schemes will be loaded in this order.")
         (gridlock-csv--get-buffer-metadata)
         (gridlock-activate-one-of-display-schemes
          gridlock-csv-preferred-display-schemes)
-        )
+        (gridlock-show-title))
     (gridlock-csv-reset)))
 
 (provide 'gridlock-csv)

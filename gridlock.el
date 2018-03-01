@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-03-01 17:19:34 dharms>
+;; Modified Time-stamp: <2018-03-01 17:42:27 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -70,7 +70,15 @@ cell, and the cadr off is a function that turns off that display.")
 (defun gridlock-show-title ()
   "Show info about the current field."
   (interactive)
-  (gridlock--show-title-helper gridlock-current-field))
+  (if gridlock-current-field
+      (gridlock--show-title-helper gridlock-current-field)
+    (let* ((pt (point))
+           (anchor (gridlock--find-anchor-on-line pt))
+           (fields (gridlock-get-fields-at anchor))
+           (idx (gridlock--lookup-field-at-pos fields pt)))
+      (and fields idx
+           (setq gridlock-current-field (aref fields idx))
+           (gridlock--show-title-helper gridlock-current-field)))))
 
 (defun gridlock--show-title-helper (field)
   "Show info about the field FIELD."
@@ -192,7 +200,6 @@ LST is a list of display scheme names."
          (fields (gridlock-get-fields-at anchor))
          (idx (gridlock--lookup-field-at-pos fields pt))
          beg)
-    ;; (message "drh prev pt %d anchor %d idx %d" pt anchor (if idx idx -34))
     (when anchor
       (setq pt anchor))
     (save-excursion
