@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-03-01 08:51:14 dharms>
+;; Modified Time-stamp: <2018-03-01 17:19:34 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -300,9 +300,7 @@ If none, return nil.  If some, return those fields."
 (defun gridlock--on-anchor-found (anchor fields)
   "Mark that anchor point ANCHOR is associated with FIELDS."
   (unless (ht-contains? gridlock-buffer-points anchor)
-    (ht-set! gridlock-buffer-points anchor fields))
-  ;; todo metadata
-  )
+    (ht-set! gridlock-buffer-points anchor fields)))
 
 (defun gridlock--parse-line (beg)
   "Parse the format of the line beginning at BEG."
@@ -386,7 +384,7 @@ Function takes one parameter, field.")
           (setq elt (aref fields i))
           (setq bounds (gridlock-field-get-bounds elt))
           (when (and (>= pt (car bounds))
-                     (< pt (cdr bounds)))
+                     (<= pt (cdr bounds)))
             (throw 'found i))
           (setq i (1+ i)))
         nil))))
