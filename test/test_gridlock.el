@@ -5,7 +5,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, February  2, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-02-28 17:33:12 dharms>
+;; Modified Time-stamp: <2018-03-01 08:31:25 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: test gridlock
 
@@ -34,6 +34,8 @@
   "Test basic parsing and searching forward."
   (let (field)
     (cl-letf (((symbol-function 'gridlock--show-title-helper)
+               (lambda(_)))
+              ((symbol-function 'gridlock--hide-title-helper)
                (lambda(_))))
       (with-temp-buffer
         (insert "One,Two,Three,\n1,2,3\n4,5,6")
@@ -70,6 +72,8 @@
   "Test basic parsing and searching backward."
   (let (anchor fields field)
     (cl-letf (((symbol-function 'gridlock--show-title-helper)
+               (lambda(_)))
+              ((symbol-function 'gridlock--hide-title-helper)
                (lambda(_))))
       (with-temp-buffer
         (insert "One,Two,Three,\n1,2,3\n4,5,6")
@@ -116,6 +120,8 @@
   "Test parsing delimited fields."
   (let (anchor field)
     (cl-letf (((symbol-function 'gridlock--show-title-helper)
+               (lambda(_)))
+              ((symbol-function 'gridlock--hide-title-helper)
                (lambda(_))))
       (with-temp-buffer
         (insert "One,Two,Three\n,,#1,2,3,\n#4,5,6\n,,,#7,8,9@,,,")
@@ -184,6 +190,8 @@
   "Test navigating between fields."
   (let (pt anchor field fields)
     (cl-letf (((symbol-function 'gridlock--show-title-helper)
+               (lambda(_)))
+              ((symbol-function 'gridlock--hide-title-helper)
                (lambda(_))))
       (with-temp-buffer
         (insert "One,Two,Three,\n#1,2,3@,o,\n4,5,6")

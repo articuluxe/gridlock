@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Tuesday, February 27, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-02-27 17:44:32 dharms>
+;; Modified Time-stamp: <2018-02-28 17:50:17 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools gridlock
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -35,8 +35,8 @@
   "Show STR (the gridlock cell's title) to the user via `popup-tip'."
   (popup-tip str))
 
-(defun gridlock-popup-off ()
-  "Stop showing field info to the user."
+(defun gridlock-popup-off (str)
+  "Stop showing field info STR to the user."
   nil)
 
 (provide 'gridlock-popup)

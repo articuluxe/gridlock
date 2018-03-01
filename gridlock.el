@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-02-28 17:33:05 dharms>
+;; Modified Time-stamp: <2018-03-01 08:30:25 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -82,9 +82,13 @@ cell, and the cadr off is a function that turns off that display.")
 (defun gridlock-hide-title ()
   "Stop showing the current field."
   (interactive)
-  (let ((func (cadr gridlock-display-funcs)))
-    (and func
-         (funcall func))))
+  (gridlock--hide-title-helper gridlock-current-field))
+
+(defun gridlock--hide-title-helper (field)
+  "Hide info about the field FIELD."
+  (let ((func (cdr gridlock-display-funcs)))
+    (and field func
+         (funcall func (gridlock-field-get-title field)))))
 
 ;;;###autoload
 (defun gridlock-choose-display-scheme ()
@@ -94,7 +98,7 @@ The schemes are selected from `gridlock-display-schemes'."
   (let ((scheme (completing-read "Display scheme: " gridlock-display-schemes nil t)))
     (and
      (gridlock-activate-display-scheme scheme)
-     (gridlock-show-title))))
+     (gridlock--show-title-helper gridlock-current-field))))
 
 (defun gridlock-activate-display-scheme (name)
   "Activate the display scheme named by NAME."
@@ -129,13 +133,15 @@ LST is a list of display scheme names."
 (defun gridlock-goto-next-line ()
   "Advance point to next anchor point."
   (interactive)
-  (let ((pt (gridlock--find-next-line)))
+  (let ((prior gridlock-current-field)
+        (pt (gridlock--find-next-line)))
     (if pt
         (progn
+          (gridlock--hide-title-helper prior)
           (goto-char pt)
           (gridlock--show-title-helper gridlock-current-field))
       (message "No further lines.")
-      (gridlock-show-title))))
+      (gridlock--show-title-helper gridlock-current-field))))
 
 (defun gridlock--find-next-line ()
   "Return location, if any, of next anchor point."
@@ -168,13 +174,15 @@ LST is a list of display scheme names."
 (defun gridlock-goto-prev-line ()
   "Advance point to prior anchor point."
   (interactive)
-  (let ((pt (gridlock--find-prev-line)))
+  (let ((prior gridlock-current-field)
+        (pt (gridlock--find-prev-line)))
     (if pt
         (progn
+          (gridlock--hide-title-helper prior)
           (goto-char pt)
           (gridlock--show-title-helper gridlock-current-field))
       (message "No prior lines.")
-      (gridlock-show-title))))
+      (gridlock--show-title-helper gridlock-current-field))))
 
 (defun gridlock--find-prev-line ()
   "Return location, if any, of prior anchor point."
@@ -210,9 +218,11 @@ LST is a list of display scheme names."
 (defun gridlock-goto-line-start ()
   "Move point to the beginning of the first field, if any, on the current line."
   (interactive)
-  (let ((pt (gridlock--find-first-field)))
+  (let ((prior gridlock-current-field)
+        (pt (gridlock--find-first-field)))
     (if pt
         (progn
+          (gridlock--hide-title-helper prior)
           (goto-char pt)
           (gridlock--show-title-helper gridlock-current-field))
       (message "No fields on current line."))))
@@ -230,9 +240,11 @@ LST is a list of display scheme names."
 (defun gridlock-goto-line-end ()
   "Move point to the beginning of the last field, if any, on the current line."
   (interactive)
-  (let ((pt (gridlock--find-last-field)))
+  (let ((prior gridlock-current-field)
+        (pt (gridlock--find-last-field)))
     (if pt
         (progn
+          (gridlock--hide-title-helper prior)
           (goto-char pt)
           (gridlock--show-title-helper gridlock-current-field))
       (message "No fields on current line."))))
@@ -251,28 +263,32 @@ LST is a list of display scheme names."
 (defun gridlock-goto-next-field ()
   "Move point to the next field, if any, on current line."
   (interactive)
-  (let ((fld (gridlock-get-next-field (point))))
+  (let ((prior gridlock-current-field)
+        (fld (gridlock-get-next-field (point))))
     (if fld
         (progn
+          (gridlock--hide-title-helper prior)
           (setq gridlock-current-field fld)
           (goto-char (car (gridlock-field-get-bounds fld)))
           (gridlock--show-title-helper gridlock-current-field))
       ;; todo allow wrap-around to next line
       (message "No further fields on this line.")
-      (gridlock-show-title))))
+      (gridlock--show-title-helper gridlock-current-field))))
 
 ;;;###autoload
 (defun gridlock-goto-previous-field ()
   "Move point to the previous field, if any, on current line."
   (interactive)
-  (let ((fld (gridlock-get-previous-field (point))))
+  (let ((prior gridlock-current-field)
+        (fld (gridlock-get-previous-field (point))))
     (if fld
         (progn
+          (gridlock--hide-title-helper prior)
           (setq gridlock-current-field fld)
           (goto-char (car (gridlock-field-get-bounds fld)))
           (gridlock--show-title-helper gridlock-current-field))
       (message "No further fields on this line.")
-      (gridlock-show-title))))
+      (gridlock--show-title-helper gridlock-current-field))))
 
 (defun gridlock--check-anchor (anchor)
   "Validate what fields can be parsed from anchor point ANCHOR.
