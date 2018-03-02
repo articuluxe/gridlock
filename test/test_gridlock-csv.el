@@ -5,7 +5,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Thursday, February 22, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-02-22 17:48:45 dharms>
+;; Modified Time-stamp: <2018-03-02 08:42:37 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: test gridlock
 
@@ -33,23 +33,27 @@
 (defun test-gridlock-csv-metadata-helper (buffer vec)
   "Helper function to test metadata parsing."
   (let (anchor fields)
-    (with-temp-buffer
-      (insert buffer)
-      (gridlock-csv-mode)
-      (search-forward-regexp "\n" nil t)
-      (search-forward-regexp "\n" nil t)
-      ;; move to the second line, before the end
-      (goto-char (1- (match-beginning 0)))
-      (setq anchor (gridlock--find-anchor-on-line (point)))
-      (setq fields (gridlock-get-fields-at anchor))
-      (should (eq (length fields) 3))
-      (should (string= (gridlock-field-get-title (aref fields 0))
-                       (aref vec 0)))
-      (should (string= (gridlock-field-get-title (aref fields 1))
-                       (aref vec 1)))
-      (should (string= (gridlock-field-get-title (aref fields 2))
-                       (aref vec 2)))
-      )))
+    (cl-letf (((symbol-function 'gridlock--show-title-helper)
+               (lambda(_)))
+              ((symbol-function 'gridlock--hide-title-helper)
+               (lambda(_))))
+      (with-temp-buffer
+        (insert buffer)
+        (gridlock-csv-mode)
+        (search-forward-regexp "\n" nil t)
+        (search-forward-regexp "\n" nil t)
+        ;; move to the second line, before the end
+        (goto-char (1- (match-beginning 0)))
+        (setq anchor (gridlock--find-anchor-on-line (point)))
+        (setq fields (gridlock-get-fields-at anchor))
+        (should (eq (length fields) 3))
+        (should (string= (gridlock-field-get-title (aref fields 0))
+                         (aref vec 0)))
+        (should (string= (gridlock-field-get-title (aref fields 1))
+                         (aref vec 1)))
+        (should (string= (gridlock-field-get-title (aref fields 2))
+                         (aref vec 2)))
+        ))))
 
 
 (ert-deftest gridlock-csv-test-metadata ()

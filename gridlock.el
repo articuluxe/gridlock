@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-03-01 17:42:27 dharms>
+;; Modified Time-stamp: <2018-03-02 08:38:45 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -63,6 +63,8 @@ If nil, the entire string to the end of line will be used.")
   "A cons cell (on . off) to control display of the current cell.
 The car ON is a function that turns on display of the current
 cell, and the cadr off is a function that turns off that display.")
+(defvar gridlock-last-display-scheme nil
+  "The last used display scheme.")
 
 (defvar-local gridlock-current-field nil "The current field.")
 
@@ -106,6 +108,7 @@ The schemes are selected from `gridlock-display-schemes'."
   (let ((scheme (completing-read "Display scheme: " gridlock-display-schemes nil t)))
     (and
      (gridlock-activate-display-scheme scheme)
+     (setq gridlock-last-display-scheme scheme)
      (gridlock--show-title-helper gridlock-current-field))))
 
 (defun gridlock-activate-display-scheme (name)
@@ -118,7 +121,9 @@ The schemes are selected from `gridlock-display-schemes'."
 (defun gridlock-activate-one-of-display-schemes (lst)
   "Iterate through LST trying to activate the named display schemes.
 LST is a list of display scheme names."
-  (seq-find #'gridlock-activate-display-scheme lst nil))
+  (or (and gridlock-last-display-scheme
+           (gridlock-activate-display-scheme gridlock-last-display-scheme))
+      (seq-find #'gridlock-activate-display-scheme lst nil)))
 
 (defun gridlock--find-anchor-on-line (pt)
   "Find location, if any, of anchor point on line containing PT."
