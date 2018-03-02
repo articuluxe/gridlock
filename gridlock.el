@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-03-02 17:45:27 dharms>
+;; Modified Time-stamp: <2018-03-02 17:52:52 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -106,6 +106,7 @@ cell, and the cadr off is a function that turns off that display.")
 The schemes are selected from `gridlock-display-schemes'."
   (interactive)
   (let ((scheme (completing-read "Display scheme: " gridlock-display-schemes nil t)))
+    (gridlock--hide-title-helper gridlock-current-field)
     (and
      (gridlock-activate-display-scheme scheme)
      (setq gridlock-last-display-scheme scheme)
