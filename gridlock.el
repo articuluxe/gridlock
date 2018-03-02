@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-03-02 08:38:45 dharms>
+;; Modified Time-stamp: <2018-03-02 17:45:27 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -174,7 +174,9 @@ LST is a list of display scheme names."
           (if (setq fields (gridlock--check-anchor beg))
               (progn
                 (gridlock--on-anchor-found beg fields)
-                (setq idx (if (and idx (< idx (length fields))) idx 0))
+                (setq idx (if (and idx (< idx (length fields)))
+                              idx
+                            (1- (length fields))))
                 (setq gridlock-current-field (aref fields idx))
                 (throw 'found (car (gridlock-field-get-bounds gridlock-current-field))))
             (setq pt beg)
@@ -218,7 +220,9 @@ LST is a list of display scheme names."
           (if (setq fields (gridlock--check-anchor beg))
               (progn
                 (gridlock--on-anchor-found beg fields)
-                (setq idx (if (and idx (< idx (length fields))) idx 0))
+                (setq idx (if (and idx (< idx (length fields)))
+                              idx
+                            (1- (length fields))))
                 (setq gridlock-current-field (aref fields idx))
                 (throw 'found (car (gridlock-field-get-bounds gridlock-current-field))))
             (setq pt beg)
