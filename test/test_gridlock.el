@@ -5,7 +5,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, February  2, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-03-01 17:24:34 dharms>
+;; Modified Time-stamp: <2018-03-02 17:42:12 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: test gridlock
 
@@ -116,18 +116,30 @@
         (should (looking-at "3"))
         ))))
 
+(defun gridlock-test-set-field-regexps (begin end)
+  "Set the field regexes to BEGIN and END, respectively."
+  (setq gridlock-field-regex-begin begin)
+  (setq gridlock-field-regex-end end))
+
+(defun gridlock-test-clear-field-regexps ()
+  "Clear the field regexes."
+  (setq gridlock-field-regex-begin nil)
+  (setq gridlock-field-regex-end nil)
+  (setq gridlock-csv-init-hook nil))
+
 (ert-deftest gridlock-test-parse-delimited-fields ()
   "Test parsing delimited fields."
-  (let (anchor field)
+  (let (anchor fields field)
     (cl-letf (((symbol-function 'gridlock--show-title-helper)
                (lambda(_)))
               ((symbol-function 'gridlock--hide-title-helper)
                (lambda(_))))
       (with-temp-buffer
         (insert "One,Two,Three\n,,#1,2,3,\n#4,5,6\n,,,#7,8,9@,,,")
+        (add-hook 'gridlock-csv-init-hook (apply-partially
+                                           'gridlock-test-set-field-regexps
+                                           "#" "@"))
         (gridlock-csv-mode)
-        (setq gridlock-field-regex-begin "#")
-        (setq gridlock-field-regex-end "@")
         (goto-char 1)
         (should (looking-at "One"))
 
@@ -169,7 +181,9 @@
 
         (gridlock-goto-next-line)
         (setq anchor (gridlock--find-anchor-on-line (point)))
-        (setq field (aref (ht-get gridlock-buffer-points anchor) 0))
+        (setq fields (gridlock-get-fields-at anchor))
+        (should (eq (length fields) 3))
+        (setq field (aref fields 0))
         (should (equal (gridlock-field-get-bounds field)
                        '(36 . 37)))
         (should (eq (gridlock-field-get-index field) 0))
@@ -184,6 +198,7 @@
                        '(40 . 41)))
         (should (eq (gridlock-field-get-index field) 2))
         (should (string= (gridlock-field-get-str field) "9"))
+        (gridlock-test-clear-field-regexps)
         ))))
 
 (ert-deftest gridlock-test-field-navigation ()
@@ -195,9 +210,11 @@
                (lambda(_))))
       (with-temp-buffer
         (insert "One,Two,Three,\n#1,2,3@,o,\n4,5,6")
+        (add-hook 'gridlock-csv-init-hook (apply-partially
+                                           'gridlock-test-set-field-regexps
+                                           "#"
+                                           "@")) ;look up from 1st field
         (gridlock-csv-mode)
-        (setq gridlock-field-regex-begin "#")
-        (setq gridlock-field-regex-end "@")      ;; look up from 1st field
         (setq pt 17)
         (goto-char pt)
         (should (looking-at "1"))
@@ -254,6 +271,7 @@
         (should (not (gridlock-get-field-at pt)))
         (should (not (gridlock-get-previous-field pt)))
         (should (not (gridlock-get-next-field pt)))
+        (gridlock-test-clear-field-regexps)
         ))))
 
 

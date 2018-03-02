@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Tuesday, February 20, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-03-01 17:44:06 dharms>
+;; Modified Time-stamp: <2018-03-02 17:31:27 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -33,6 +33,9 @@
   '("popup" "pos-tip" "quick-peek" "echo")
   "Preferred display schemes for `gridlock-csv-mode'.
 Display schemes will be loaded in this order.")
+
+(defvar gridlock-csv-init-hook '()
+  "Hooks run after setting up `gridlock-csv-mode' but before inspecting buffer.")
 
 (defvar-local gridlock-csv-metadata nil
   "The metadata for this csv buffer.")
@@ -95,6 +98,7 @@ Display schemes will be loaded in this order.")
         (setq gridlock-field-regex-begin nil)
         (setq gridlock-field-regex-end nil)
         (setq gridlock-field-get-title-func #'gridlock-csv-get-title)
+        (run-hooks 'gridlock-csv-init-hook)
         (gridlock-csv-reset)
         (gridlock-csv--get-buffer-metadata)
         (gridlock-activate-one-of-display-schemes
