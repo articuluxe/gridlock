@@ -126,6 +126,35 @@ LST is a list of display scheme names."
            (gridlock-activate-display-scheme gridlock-last-display-scheme))
       (seq-find #'gridlock-activate-display-scheme lst nil)))
 
+;;;###autoload
+(defun gridlock-jump-to-field-index ()
+  "Jump point to the specified field index."
+  (interactive)
+  (let* ((pt (point))
+         (prior gridlock-current-field)
+         (anchor (gridlock--find-anchor-on-line pt))
+         (fields (gridlock-get-fields-at anchor))
+         (total (length fields))
+         (idx 0)
+         c)
+    (if (eq total 0)
+        (error "No fields on current line")
+      (unwind-protect
+          (catch 'exit
+            (while (or (< idx 1) (> idx total))
+              (setq c (read-from-minibuffer
+                       (format "Jump to field (must be between 1 and %d, 'q' to cancel): "
+                               total)))
+              (setq idx (cond ((string= c "q")
+                               (throw 'exit nil))
+                              ((number-or-marker-p (read c))
+                               (read c))
+                              (t 0))))
+            (setq gridlock-current-field (aref fields (1- idx)))
+            (gridlock--hide-title-helper prior)
+            (goto-char (car (gridlock-field-get-bounds gridlock-current-field))))
+        (gridlock--show-title-helper gridlock-current-field)))))
+
 (defun gridlock--find-anchor-on-line (pt)
   "Find location, if any, of anchor point on line containing PT."
   (let (anchor fields)
@@ -451,6 +480,7 @@ Function takes one parameter, field.")
   (define-key map "e" #'gridlock-goto-line-end)
   (define-key map (kbd "SPC") #'gridlock-show-title)
   (define-key map "`" #'gridlock-choose-display-scheme)
+  (define-key map "v" #'gridlock-jump-to-field-index)
   )
 
 (defvar gridlock-mode-map
