@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Tuesday, February 20, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-03-02 17:31:27 dharms>
+;; Modified Time-stamp: <2018-03-05 08:33:58 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -66,7 +66,7 @@ Display schemes will be loaded in this order.")
   (let ((idx (gridlock-field-get-index field))
         (len (length gridlock-csv-metadata)))
     (if (>= idx len)
-        (format "Heading %d" idx)
+        (format "Heading %d" (1+ idx))  ;start ot 1 for user-visible names
       (aref gridlock-csv-metadata idx))))
 
 (defvar gridlock-csv-mode-map
