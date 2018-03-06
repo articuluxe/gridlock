@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-03-02 17:52:52 dharms>
+;; Modified Time-stamp: <2018-03-06 09:03:17 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -66,6 +66,14 @@ cell, and the cadr off is a function that turns off that display.")
 (defvar gridlock-last-display-scheme nil
   "The last used display scheme.")
 
+;; metadata
+(defvar gridlock-metadata-get-title-func nil
+  "Given a record FIELD, return its grid's title.
+Function takes one parameter, field.")
+(defvar gridlock-metadata-gather-titles-func nil
+  "Return a list of all the field headings.
+Takes one parameter: FIELDS, a list of fields.")
+
 (defvar-local gridlock-current-field nil "The current field.")
 
 ;;;###autoload
@@ -127,8 +135,8 @@ LST is a list of display scheme names."
       (seq-find #'gridlock-activate-display-scheme lst nil)))
 
 ;;;###autoload
-(defun gridlock-jump-to-field-index ()
-  "Jump point to the specified field index."
+(defun gridlock-jump-to-field-by-index ()
+  "Jump point to the field according to index specified by the user."
   (interactive)
   (let* ((pt (point))
          (prior gridlock-current-field)
@@ -151,6 +159,37 @@ LST is a list of display scheme names."
                                (read c))
                               (t 0))))
             (setq gridlock-current-field (aref fields (1- idx)))
+            (gridlock--hide-title-helper prior)
+            (goto-char (car (gridlock-field-get-bounds gridlock-current-field))))
+        (gridlock--show-title-helper gridlock-current-field)))))
+
+(defun gridlock-jump-to-field-by-heading ()
+  "Jump point to the field specified by a heading selected by the user."
+  (interactive)
+  (let* ((pt (point))
+         (prior gridlock-current-field)
+         (anchor (gridlock--find-anchor-on-line pt))
+         (fields (gridlock-get-fields-at anchor))
+         (total (length fields))
+         (idx 0)
+         (i 0)
+         headings choice element)
+    (if (eq total 0)
+        (error "No fields on current line")
+      (when gridlock-metadata-gather-titles-func
+        (dolist (elt (funcall gridlock-metadata-gather-titles-func fields))
+          (setq headings (cons (cons elt i)
+                               headings))
+          (setq i (1+ i))))
+      (setq headings (nreverse headings))
+      (unwind-protect
+          (catch 'exit
+            (setq choice (completing-read "Jump to heading: " headings nil t))
+            (setq element (assoc choice headings))
+            (if element
+                (setq idx (cdr element))
+              (throw 'exit nil))
+            (setq gridlock-current-field (aref fields idx))
             (gridlock--hide-title-helper prior)
             (goto-char (car (gridlock-field-get-bounds gridlock-current-field))))
         (gridlock--show-title-helper gridlock-current-field)))))
@@ -399,14 +438,10 @@ This is a cons cell (BEG . END) of the field's bounds."
   "Given a record FIELD, return its string value."
   (nth 2 field))
 
-(defvar gridlock-field-get-title-func nil
-  "Given a record FIELD, return its grid's title.
-Function takes one parameter, field.")
-
 (defun gridlock-field-get-title (field)
   "Given a record FIELD, return its grid's title."
-  (and gridlock-field-get-title-func
-       (funcall gridlock-field-get-title-func field)))
+  (and gridlock-metadata-get-title-func
+       (funcall gridlock-metadata-get-title-func field)))
 
 (defun gridlock-get-field-at (point)
   "Return the field, if any, that POINT lies on."
@@ -480,7 +515,8 @@ Function takes one parameter, field.")
   (define-key map "e" #'gridlock-goto-line-end)
   (define-key map (kbd "SPC") #'gridlock-show-title)
   (define-key map "`" #'gridlock-choose-display-scheme)
-  (define-key map "v" #'gridlock-jump-to-field-index)
+  (define-key map "v" #'gridlock-jump-to-field-by-index)
+  (define-key map "j" #'gridlock-jump-to-field-by-heading)
   )
 
 (defvar gridlock-mode-map

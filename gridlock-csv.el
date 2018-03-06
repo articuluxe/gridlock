@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Tuesday, February 20, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-03-05 08:33:58 dharms>
+;; Modified Time-stamp: <2018-03-06 09:03:18 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -69,6 +69,10 @@ Display schemes will be loaded in this order.")
         (format "Heading %d" (1+ idx))  ;start ot 1 for user-visible names
       (aref gridlock-csv-metadata idx))))
 
+(defun gridlock-csv-gather-titles (fields)
+  "Return a list of all field headings in field list FIELDS."
+  (mapcar 'identity gridlock-csv-metadata))
+
 (defvar gridlock-csv-mode-map
   (let ((map gridlock-mode-map))
     (define-key map [t] 'gridlock-csv-turn-off)
@@ -97,7 +101,8 @@ Display schemes will be loaded in this order.")
         (setq gridlock-field-delimiter ",")
         (setq gridlock-field-regex-begin nil)
         (setq gridlock-field-regex-end nil)
-        (setq gridlock-field-get-title-func #'gridlock-csv-get-title)
+        (setq gridlock-metadata-get-title-func #'gridlock-csv-get-title)
+        (setq gridlock-metadata-gather-titles-func #'gridlock-csv-gather-titles)
         (run-hooks 'gridlock-csv-init-hook)
         (gridlock-csv-reset)
         (gridlock-csv--get-buffer-metadata)
