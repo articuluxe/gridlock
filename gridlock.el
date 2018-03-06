@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-03-06 09:03:17 dharms>
+;; Modified Time-stamp: <2018-03-06 17:45:32 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -139,7 +139,6 @@ LST is a list of display scheme names."
   "Jump point to the field according to index specified by the user."
   (interactive)
   (let* ((pt (point))
-         (prior gridlock-current-field)
          (anchor (gridlock--find-anchor-on-line pt))
          (fields (gridlock-get-fields-at anchor))
          (total (length fields))
@@ -158,8 +157,8 @@ LST is a list of display scheme names."
                               ((number-or-marker-p (read c))
                                (read c))
                               (t 0))))
+            (gridlock--hide-title-helper gridlock-current-field)
             (setq gridlock-current-field (aref fields (1- idx)))
-            (gridlock--hide-title-helper prior)
             (goto-char (car (gridlock-field-get-bounds gridlock-current-field))))
         (gridlock--show-title-helper gridlock-current-field)))))
 
@@ -167,7 +166,6 @@ LST is a list of display scheme names."
   "Jump point to the field specified by a heading selected by the user."
   (interactive)
   (let* ((pt (point))
-         (prior gridlock-current-field)
          (anchor (gridlock--find-anchor-on-line pt))
          (fields (gridlock-get-fields-at anchor))
          (total (length fields))
@@ -189,8 +187,37 @@ LST is a list of display scheme names."
             (if element
                 (setq idx (cdr element))
               (throw 'exit nil))
+            (gridlock--hide-title-helper gridlock-current-field)
             (setq gridlock-current-field (aref fields idx))
-            (gridlock--hide-title-helper prior)
+            (goto-char (car (gridlock-field-get-bounds gridlock-current-field))))
+        (gridlock--show-title-helper gridlock-current-field)))))
+
+(defun gridlock-jump-to-field-by-content ()
+  "Jump point to the field specified by content selected by the user."
+  (interactive)
+  (let* ((pt (point))
+         (anchor (gridlock--find-anchor-on-line pt))
+         (fields (gridlock-get-fields-at anchor))
+         (total (length fields))
+         (idx 0)
+         (i 0)
+         elt choices choice element)
+    (if (eq total 0)
+        (error "No fields on current line")
+      (while (< i total)
+        (setq elt (aref fields i))
+        (setq choices (cons (cons (gridlock-field-get-str elt) i) choices))
+        (setq i (1+ i)))
+      (setq choices (nreverse choices))
+      (unwind-protect
+          (catch 'exit
+            (setq choice (completing-read "Jump to field: " choices nil t))
+            (setq element (assoc choice choices))
+            (if element
+                (setq idx (cdr element))
+              (throw 'exit nil))
+            (gridlock--hide-title-helper gridlock-current-field)
+            (setq gridlock-current-field (aref fields idx))
             (goto-char (car (gridlock-field-get-bounds gridlock-current-field))))
         (gridlock--show-title-helper gridlock-current-field)))))
 
@@ -517,6 +544,7 @@ This is a cons cell (BEG . END) of the field's bounds."
   (define-key map "`" #'gridlock-choose-display-scheme)
   (define-key map "v" #'gridlock-jump-to-field-by-index)
   (define-key map "j" #'gridlock-jump-to-field-by-heading)
+  (define-key map "g" #'gridlock-jump-to-field-by-content)
   )
 
 (defvar gridlock-mode-map
