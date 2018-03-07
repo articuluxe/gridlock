@@ -419,24 +419,24 @@ If none, return nil.  If some, return those fields."
   "Parse the format of the line beginning at BEG."
   (save-excursion
     (save-match-data
-      (let ((pt beg)
-            (end (line-end-position))
-            (idx 0)
-            lst str vec)
+      (let ((idx 0)
+            pt end lst str vec)
         (goto-char beg)
+        (setq end (line-end-position))
         (and gridlock-field-regex-begin
              (not (string-empty-p gridlock-field-regex-begin))
+             (goto-char (line-beginning-position))
              (search-forward-regexp gridlock-field-regex-begin end t)
              (setq beg (or (match-end 0) beg))
-             (setq pt beg)
-             (goto-char beg)
-             gridlock-field-regex-end
+             (goto-char beg))
+        (and gridlock-field-regex-end
              (not (string-empty-p gridlock-field-regex-end))
              (search-forward-regexp gridlock-field-regex-end end t)
              (setq end (or (match-beginning 0) end))
              ;; (message "pre: beg %d end %d" beg end)
-             (goto-char beg)
              )
+        (goto-char beg)
+        (setq pt beg)
         (while (search-forward-regexp gridlock-field-delimiter end t)
           (setq str (buffer-substring-no-properties
                      pt (match-beginning 0)))
