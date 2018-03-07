@@ -92,9 +92,10 @@ Takes one parameter: FIELDS, a list of fields.")
 
 (defun gridlock--show-title-helper (field)
   "Show info about the field FIELD."
-  (let ((func (car gridlock-display-funcs)))
-    (and field func
-         (funcall func (gridlock-field-get-title field)))))
+  (let ((func (car gridlock-display-funcs))
+        (title (gridlock-field-get-title field)))
+    (and field func title
+         (funcall func title))))
 
 ;;;###autoload
 (defun gridlock-hide-title ()
