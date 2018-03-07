@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Tuesday, February 20, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-03-06 09:03:18 dharms>
+;; Modified Time-stamp: <2018-03-07 12:07:22 dan.harms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -54,7 +54,8 @@ Display schemes will be loaded in this order.")
            (setq gridlock-csv-metadata
                  (make-vector len ""))
            (while (< i len)
-             (aset gridlock-csv-metadata i (gridlock-field-get-str (aref fields i)))
+             (aset gridlock-csv-metadata i
+                   (string-trim (gridlock-field-get-str (aref fields i))))
              (setq i (1+ i)))))))
 
 (defun gridlock-csv--reset-metadata ()
