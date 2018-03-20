@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-03-06 17:45:32 dharms>
+;; Modified Time-stamp: <2018-03-20 17:37:00 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -446,8 +446,7 @@ If none, return nil.  If some, return those fields."
           (setq pt (point)))
         (setq str (string-trim (buffer-substring-no-properties pt end)))
         ;; (message "post: end pt is %d, end is %d, str is %s" pt end str)
-        (unless (string-empty-p str)
-          (push (list (cons pt (+ pt (length str))) idx str) lst))
+        (push (list (cons pt (+ pt (length str))) idx str) lst)
         (setq vec (make-vector (length lst) nil))
         (dolist (elt (nreverse lst) vec)
           (aset vec (gridlock-field-get-index elt) elt)
