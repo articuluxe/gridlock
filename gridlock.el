@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-03-20 17:37:00 dharms>
+;; Modified Time-stamp: <2018-03-21 17:45:08 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -30,6 +30,7 @@
 (require 'subr-x)
 (require 'ht)
 (require 'seq)
+(require 'eieio)
 
 (defvar gridlock-display-schemes nil
   "List of display schemes capable of being used by `gridlock-mode'.")
@@ -75,6 +76,38 @@ Function takes one parameter, field.")
 Takes one parameter: FIELDS, a list of fields.")
 
 (defvar-local gridlock-current-field nil "The current field.")
+
+(defclass gridlock-field ()
+  ((index :initarg :index
+          :type (integer 0 *)
+          :documentation "The index of the field on its line."
+          )
+   (string :initarg :string
+           :type string
+           :documentation "The string value of the field."
+           )
+   (begin :initarg :begin
+          :type (integer 0 *)
+          :documentation "The field's beginning buffer position."
+          )
+   (end :initarg :end
+        :type (integer 0 *)
+        :documentation "The field's ending buffer position."
+        )
+   )
+  "A field of interest.")
+
+(defmethod gridlock-get-index ((field gridlock-field))
+  "Get the field's index in its containing line."
+  (oref field :index))
+
+(defmethod gridlock-get-str ((field gridlock-field))
+  "Get the field's string content."
+  (oref field :string))
+
+(defmethod gridlock-get-bounds ((field gridlock-field))
+  "Get the field's bounds, as a cons cell (BEG. END)."
+  (cons (oref field :begin) (oref field :end)))
 
 ;;;###autoload
 (defun gridlock-show-title ()
@@ -160,7 +193,7 @@ LST is a list of display scheme names."
                               (t 0))))
             (gridlock--hide-title-helper gridlock-current-field)
             (setq gridlock-current-field (aref fields (1- idx)))
-            (goto-char (car (gridlock-field-get-bounds gridlock-current-field))))
+            (goto-char (car (gridlock-get-bounds gridlock-current-field))))
         (gridlock--show-title-helper gridlock-current-field)))))
 
 (defun gridlock-jump-to-field-by-heading ()
@@ -190,7 +223,7 @@ LST is a list of display scheme names."
               (throw 'exit nil))
             (gridlock--hide-title-helper gridlock-current-field)
             (setq gridlock-current-field (aref fields idx))
-            (goto-char (car (gridlock-field-get-bounds gridlock-current-field))))
+            (goto-char (car (gridlock-get-bounds gridlock-current-field))))
         (gridlock--show-title-helper gridlock-current-field)))))
 
 (defun gridlock-jump-to-field-by-content ()
@@ -207,7 +240,7 @@ LST is a list of display scheme names."
         (error "No fields on current line")
       (while (< i total)
         (setq elt (aref fields i))
-        (setq choices (cons (cons (gridlock-field-get-str elt) i) choices))
+        (setq choices (cons (cons (gridlock-get-str elt) i) choices))
         (setq i (1+ i)))
       (setq choices (nreverse choices))
       (unwind-protect
@@ -219,7 +252,7 @@ LST is a list of display scheme names."
               (throw 'exit nil))
             (gridlock--hide-title-helper gridlock-current-field)
             (setq gridlock-current-field (aref fields idx))
-            (goto-char (car (gridlock-field-get-bounds gridlock-current-field))))
+            (goto-char (car (gridlock-get-bounds gridlock-current-field))))
         (gridlock--show-title-helper gridlock-current-field)))))
 
 (defun gridlock--find-anchor-on-line (pt)
@@ -275,7 +308,7 @@ LST is a list of display scheme names."
                               idx
                             (1- (length fields))))
                 (setq gridlock-current-field (aref fields idx))
-                (throw 'found (car (gridlock-field-get-bounds gridlock-current-field))))
+                (throw 'found (car (gridlock-get-bounds gridlock-current-field))))
             (setq pt beg)
             (goto-char (1+ beg))
             (setq beg
@@ -321,7 +354,7 @@ LST is a list of display scheme names."
                               idx
                             (1- (length fields))))
                 (setq gridlock-current-field (aref fields idx))
-                (throw 'found (car (gridlock-field-get-bounds gridlock-current-field))))
+                (throw 'found (car (gridlock-get-bounds gridlock-current-field))))
             (setq pt beg)
             (goto-char (1- beg))
             (setq beg (if (eq (point) beg)
@@ -348,7 +381,7 @@ LST is a list of display scheme names."
          (fields (gridlock-get-fields-at anchor)))
     (when (> (length fields) 0)
       (setq gridlock-current-field (aref fields 0))
-      (car (gridlock-field-get-bounds gridlock-current-field)))))
+      (car (gridlock-get-bounds gridlock-current-field)))))
 
 ;;;###autoload
 (defun gridlock-goto-line-end ()
@@ -371,7 +404,7 @@ LST is a list of display scheme names."
          (len (length fields)))
     (when (> len 0)
       (setq gridlock-current-field (aref fields (1- len)))
-      (car (gridlock-field-get-bounds gridlock-current-field)))))
+      (car (gridlock-get-bounds gridlock-current-field)))))
 
 ;;;###autoload
 (defun gridlock-goto-next-field ()
@@ -383,7 +416,7 @@ LST is a list of display scheme names."
         (progn
           (gridlock--hide-title-helper prior)
           (setq gridlock-current-field fld)
-          (goto-char (car (gridlock-field-get-bounds fld)))
+          (goto-char (car (gridlock-get-bounds fld)))
           (gridlock--show-title-helper gridlock-current-field))
       ;; todo allow wrap-around to next line
       (message "No further fields on this line.")
@@ -399,7 +432,7 @@ LST is a list of display scheme names."
         (progn
           (gridlock--hide-title-helper prior)
           (setq gridlock-current-field fld)
-          (goto-char (car (gridlock-field-get-bounds fld)))
+          (goto-char (car (gridlock-get-bounds fld)))
           (gridlock--show-title-helper gridlock-current-field))
       (message "No further fields on this line.")
       (gridlock--show-title-helper gridlock-current-field))))
@@ -441,29 +474,20 @@ If none, return nil.  If some, return those fields."
           (setq str (buffer-substring-no-properties
                      pt (match-beginning 0)))
           ;; (message "during: bounds: (%d,%d) end is %d, str is %s" pt (match-beginning 0) end str)
-          (push (list (cons pt (match-beginning 0)) idx str) lst)
+          (push
+           (gridlock-field :begin pt :end (match-beginning 0) :index idx :string str)
+           lst)
           (setq idx (1+ idx))
           (setq pt (point)))
         (setq str (string-trim (buffer-substring-no-properties pt end)))
         ;; (message "post: end pt is %d, end is %d, str is %s" pt end str)
-        (push (list (cons pt (+ pt (length str))) idx str) lst)
+        (push
+         (gridlock-field :begin pt :end (+ pt (length str)) :index idx :string str)
+         lst)
         (setq vec (make-vector (length lst) nil))
         (dolist (elt (nreverse lst) vec)
-          (aset vec (gridlock-field-get-index elt) elt)
+          (aset vec (gridlock-get-index elt) elt)
           )))))
-
-(defun gridlock-field-get-bounds (field)
-  "Given a record FIELD, return its bounds.
-This is a cons cell (BEG . END) of the field's bounds."
-  (nth 0 field))
-
-(defun gridlock-field-get-index (field)
-  "Given a record FIELD, return its index."
-  (nth 1 field))
-
-(defun gridlock-field-get-str (field)
-  "Given a record FIELD, return its string value."
-  (nth 2 field))
 
 (defun gridlock-field-get-title (field)
   "Given a record FIELD, return its grid's title."
@@ -490,7 +514,7 @@ This is a cons cell (BEG . END) of the field's bounds."
       (progn
         (while (< i len)
           (setq elt (aref fields i))
-          (setq bounds (gridlock-field-get-bounds elt))
+          (setq bounds (gridlock-get-bounds elt))
           (when (and (>= pt (car bounds))
                      (<= pt (cdr bounds)))
             (throw 'found i))
