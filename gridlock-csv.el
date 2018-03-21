@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Tuesday, February 20, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-03-07 12:07:22 dan.harms>
+;; Modified Time-stamp: <2018-03-21 17:27:38 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -64,11 +64,14 @@ Display schemes will be loaded in this order.")
 
 (defun gridlock-csv-get-title (field)
   "Return the title associated with FIELD."
-  (let ((idx (gridlock-field-get-index field))
-        (len (length gridlock-csv-metadata)))
+  (let* ((idx (gridlock-field-get-index field))
+         (len (length gridlock-csv-metadata))
+         (default (format "Heading %d" (1+ idx)))
+         str)
     (if (>= idx len)
-        (format "Heading %d" (1+ idx))  ;start ot 1 for user-visible names
-      (aref gridlock-csv-metadata idx))))
+        default                         ;start ot 1 for user-visible names
+      (setq str (aref gridlock-csv-metadata idx))
+      (if (string-empty-p str) default str))))
 
 (defun gridlock-csv-gather-titles (fields)
   "Return a list of all field headings in field list FIELDS."
