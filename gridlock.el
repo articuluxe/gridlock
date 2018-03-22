@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-03-21 17:45:08 dharms>
+;; Modified Time-stamp: <2018-03-22 08:34:49 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -77,6 +77,7 @@ Takes one parameter: FIELDS, a list of fields.")
 
 (defvar-local gridlock-current-field nil "The current field.")
 
+;; field class
 (defclass gridlock-field ()
   ((index :initarg :index
           :type (integer 0 *)
@@ -97,6 +98,7 @@ Takes one parameter: FIELDS, a list of fields.")
    )
   "A field of interest.")
 
+;; field accessors
 (defmethod gridlock-get-index ((field gridlock-field))
   "Get the field's index in its containing line."
   (oref field :index))
@@ -106,7 +108,7 @@ Takes one parameter: FIELDS, a list of fields.")
   (oref field :string))
 
 (defmethod gridlock-get-bounds ((field gridlock-field))
-  "Get the field's bounds, as a cons cell (BEG. END)."
+  "Get the field's bounds, as a cons cell (BEG . END)."
   (cons (oref field :begin) (oref field :end)))
 
 ;;;###autoload
