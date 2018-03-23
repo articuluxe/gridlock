@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Thursday, March 22, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-03-22 08:44:08 dharms>
+;; Modified Time-stamp: <2018-03-23 17:48:46 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -37,25 +37,51 @@ Display schemes will be loaded in this order.")
 (defvar gridlock-fix-init-hook '()
   "Hooks run after setting up `gridlock-fix-mode' but before inspecting buffer.")
 
-(defvar-local gridlock-fix-metadata nil
+(defvar-local gridlock-fix-metadata (make-hash-table :size 1000)
   "The metadata for this fix buffer.")
+
+(defun gridlock-fix--reset-metadata ()
+  "Reset the metadata associated with the current buffer in `gridlock-fix-mode'."
+  (clrhash gridlock-fix-metadata))      ;todo needed?
+
+(defun gridlock-fix--get-buffer-metadata ()
+  "Initialize the buffer's metadata for `gridlock-fix-mode'."
+  (puthash 8 "mine" gridlock-fix-metadata)
+  )
+
+;; field class override for fix
+(defclass gridlock-fix-field (gridlock-field)
+  ((tag :initarg :tag
+        :type (integer 0 *)
+        :documentation "The fix tag's numeric value."))
+  "A fix field of interest.")
+
+(defmethod gridlock-fix-get-tag ((field gridlock-fix-field))
+  "Get the fix tag number associated with FIELD."
+  (oref field tag))
+
+(defun gridlock-fix-create-field (beg end index str)
+  "Create a gridlock-fix-field instance with the associated values.
+It stretches from BEG to END, has index INDEX, and value STR."
+  (let ((field (gridlock-fix-field
+                :begin beg :end end
+                :index index))
+        tag value)
+    ;; todo
+    (oset field tag tag)
+    (oset field string value)
+  ))
 
 (defun gridlock-fix-get-title (field)
   "Return the title associated with FIELD."
-  ;; (let* ((idx (gridlock-get-index field))
-  ;;        (len (length gridlock-csv-metadata))
-  ;;        (default (format "Heading %d" (1+ idx)))
-  ;;        str)
-  ;;   (if (>= idx len)
-  ;;       default                         ;start ot 1 for user-visible names
-  ;;     (setq str (aref gridlock-csv-metadata idx))
-  ;;     (if (string-empty-p str) default str)))
-  )
+  (let* ((tag (gridlock-fix-get-tag field))
+         (str (gethash tag gridlock-fix-metadata)))
+    "field"))
 
 (defun gridlock-fix-gather-titles (fields)
   "Return a list of all field headings in field list FIELDS."
-  ;; (mapcar 'identity gridlock-csv-metadata)
-  )
+  (mapcar (lambda (field)
+            (gridlock-fix-get-title field)) fields))
 
 (defvar gridlock-fix-mode-map
   (let ((map gridlock-mode-map))
@@ -81,12 +107,13 @@ Display schemes will be loaded in this order.")
   :keymap gridlock-fix-mode-map
   (if gridlock-fix-mode
       (progn
-        (setq gridlock-anchor-regex "^")
-        (setq gridlock-field-delimiter "\000")
-        (setq gridlock-field-regex-begin "fix payload=")
-        (setq gridlock-field-regex-end nil)
+        (setq gridlock-anchor-regex "FIX\\.[45]")
+        (setq gridlock-field-delimiter "|")
+        (setq gridlock-field-regex-begin "8=")
+        (setq gridlock-field-regex-end "10=.+")
         (setq gridlock-metadata-get-title-func #'gridlock-fix-get-title)
         (setq gridlock-metadata-gather-titles-func #'gridlock-fix-gather-titles)
+        (setq gridlock-create-field-func #'gridlock-fix-create-field)
         (run-hooks 'gridlock-fix-init-hook)
         (gridlock-fix-reset)
         (gridlock-fix--get-buffer-metadata)

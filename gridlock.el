@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-03-23 16:57:59 dan.harms>
+;; Modified Time-stamp: <2018-03-23 20:26:14 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -84,6 +84,7 @@ Takes one parameter: FIELDS, a list of fields.")
           :documentation "The index of the field on its line."
           )
    (string :initarg :string
+           :initform ""
            :type string
            :documentation "The string value of the field."
            )
@@ -101,15 +102,24 @@ Takes one parameter: FIELDS, a list of fields.")
 ;; field accessors
 (defmethod gridlock-get-index ((field gridlock-field))
   "Get the field's index in its containing line."
-  (oref field :index))
+  (oref field index))
 
 (defmethod gridlock-get-str ((field gridlock-field))
   "Get the field's string content."
-  (oref field :string))
+  (oref field string))
 
 (defmethod gridlock-get-bounds ((field gridlock-field))
   "Get the field's bounds, as a cons cell (BEG . END)."
-  (cons (oref field :begin) (oref field :end)))
+  (cons (oref field begin) (oref field end)))
+
+;; field creation helpers
+(defun gridlock-create-field-default (beg end index str)
+  "Create a gridlock field.
+The field stretches from BEG to END, with INDEX and value STR."
+  (gridlock-field :begin beg :end end :index index :string str))
+;; field creator
+(defvar gridlock-create-field-func #'gridlock-create-field-default
+  "The default function to create a gridlock field.")
 
 ;;;###autoload
 (defun gridlock-show-title ()
@@ -484,14 +494,14 @@ If none, return nil.  If some, return those fields."
                      pt (match-beginning 0)))
           ;; (message "during: bounds: (%d,%d) end is %d, str is %s" pt (match-beginning 0) end str)
           (push
-           (gridlock-field :begin pt :end (match-beginning 0) :index idx :string str)
+           (funcall gridlock-create-field-func pt (match-beginning 0) idx str)
            lst)
           (setq idx (1+ idx))
           (setq pt (point)))
         (setq str (string-trim (buffer-substring-no-properties pt end)))
         ;; (message "post: end pt is %d, end is %d, str is %s" pt end str)
         (push
-         (gridlock-field :begin pt :end (+ pt (length str)) :index idx :string str)
+         (funcall gridlock-create-field-func pt (+ pt (length str)) idx str)
          lst)
         (setq vec (make-vector (length lst) nil))
         (dolist (elt (nreverse lst) vec)
