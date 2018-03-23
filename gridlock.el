@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-03-23 16:04:30 dan.harms>
+;; Modified Time-stamp: <2018-03-23 16:57:59 dan.harms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -293,13 +293,16 @@ LST is a list of display scheme names."
 (defun gridlock--find-next-line ()
   "Return location, if any, of next anchor point."
   (let* ((pt (point))
+         (line (line-beginning-position))
          (anchor (gridlock--find-anchor-on-line pt))
          (fields (gridlock-get-fields-at anchor))
          (idx (gridlock--lookup-field-at-pos fields pt))
          beg)
     (save-excursion
       (setq beg (search-forward-regexp gridlock-anchor-regex nil t))
-      (when (eq beg pt)
+      (when (and beg (save-excursion
+                       (goto-char beg)
+                       (eq line (line-beginning-position))))
         (goto-char (1+ (point)))
         (setq beg (search-forward-regexp gridlock-anchor-regex nil t)))
       (catch 'found
