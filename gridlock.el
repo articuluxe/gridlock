@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-03-23 15:45:16 dan.harms>
+;; Modified Time-stamp: <2018-03-23 16:04:30 dan.harms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -304,7 +304,7 @@ LST is a list of display scheme names."
         (setq beg (search-forward-regexp gridlock-anchor-regex nil t)))
       (catch 'found
         (while beg
-          (if (setq fields (gridlock--check-anchor beg))
+          (if (setq fields (gridlock--check-anchor beg)) ;todo what if already present?
               (progn
                 (gridlock--on-anchor-found beg fields)
                 (setq idx (if (and idx (< idx (length fields)))
@@ -345,12 +345,14 @@ LST is a list of display scheme names."
     (save-excursion
       (goto-char pt)
       (setq beg (search-backward-regexp gridlock-anchor-regex nil t))
+      (when beg (setq beg (match-end 0)))
       (when (eq beg pt)
         (goto-char (1- (point)))
-        (setq beg (search-backward-regexp gridlock-anchor-regex nil t)))
+        (setq beg (search-backward-regexp gridlock-anchor-regex nil t))
+        (when beg (setq beg (match-end 0))))
       (catch 'found
         (while beg
-          (if (setq fields (gridlock--check-anchor beg))
+          (if (setq fields (gridlock--check-anchor beg)) ;todo what if already exists?
               (progn
                 (gridlock--on-anchor-found beg fields)
                 (setq idx (if (and idx (< idx (length fields)))
@@ -362,7 +364,8 @@ LST is a list of display scheme names."
             (goto-char (1- beg))
             (setq beg (if (eq (point) beg)
                           nil
-                        (search-backward-regexp gridlock-anchor-regex nil t)))))))))
+                        (search-backward-regexp gridlock-anchor-regex nil t)))
+            (when beg (setq beg (match-end 0)))))))))
 
 ;;;###autoload
 (defun gridlock-goto-line-start ()
