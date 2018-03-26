@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-03-23 20:26:14 dharms>
+;; Modified Time-stamp: <2018-03-26 08:44:44 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -273,10 +273,10 @@ LST is a list of display scheme names."
     (save-excursion
       (goto-char pt)
       (goto-char (line-beginning-position))
-      (when (setq anchor (search-forward-regexp gridlock-anchor-regex (line-end-position) t))
-        (unless (gridlock-get-fields-at anchor)
-          (setq fields (gridlock--check-anchor anchor))
-          (gridlock--on-anchor-found anchor fields)))
+      (and (setq anchor (search-forward-regexp gridlock-anchor-regex (line-end-position) t))
+           (not (gridlock-get-fields-at anchor))
+           (setq fields (gridlock--check-anchor anchor))
+           (gridlock--on-anchor-found anchor fields))
       anchor)))
 
 (defun gridlock-reset ()
