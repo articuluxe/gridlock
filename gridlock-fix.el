@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Thursday, March 22, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-03-23 17:48:46 dharms>
+;; Modified Time-stamp: <2018-03-26 08:41:52 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -29,6 +29,27 @@
 ;;; Code:
 (require 'gridlock)
 
+(defun gridlock-fix--read-file-into-list-of-lines (file)
+  "Read FILE into a list of strings split line by line."
+  (interactive "f")
+  (with-temp-buffer
+    (insert-file-contents file)
+    (split-string (buffer-string) "\n" t)))
+
+(defun gridlock-fix-metadata-read-file (hash file)
+  "Insert into HASH fix metadata from FILE."
+  (let ((lines (gridlock-fix--read-file-into-list-of-lines file))
+        arr str)
+    (dolist (line lines hash)
+      (setq arr (split-string line ","))
+      (setq str (format "%s (%s) %s %s"
+                        (nth arr 1)
+                        (nth arr 2)
+                        (nth arr 3)
+                        (nth arr 4)))
+      (puthash (string-to-number (nth arr 0))
+               str hash))))
+
 (defcustom gridlock-fix-preferred-display-schemes
   '("popup" "pos-tip" "quick-peek" "echo")
   "Preferred display schemes for `gridlock-fix-mode'.
@@ -37,7 +58,7 @@ Display schemes will be loaded in this order.")
 (defvar gridlock-fix-init-hook '()
   "Hooks run after setting up `gridlock-fix-mode' but before inspecting buffer.")
 
-(defvar-local gridlock-fix-metadata (make-hash-table :size 1000)
+(defvar-local gridlock-fix-metadata (make-hash-table :size 500)
   "The metadata for this fix buffer.")
 
 (defun gridlock-fix--reset-metadata ()
@@ -46,8 +67,7 @@ Display schemes will be loaded in this order.")
 
 (defun gridlock-fix--get-buffer-metadata ()
   "Initialize the buffer's metadata for `gridlock-fix-mode'."
-  (puthash 8 "mine" gridlock-fix-metadata)
-  )
+  (gridlock-fix-metadata-read-file gridlock-fix-metadata "fix4.2-out.csv"))
 
 ;; field class override for fix
 (defclass gridlock-fix-field (gridlock-field)
