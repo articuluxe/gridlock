@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-03-26 17:31:27 dharms>
+;; Modified Time-stamp: <2018-03-27 17:32:09 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -137,10 +137,11 @@ The field stretches from BEG to END, with INDEX and value STR."
 
 (defun gridlock--show-title-helper (field)
   "Show info about the field FIELD."
-  (let ((func (car gridlock-display-funcs))
-        (title (gridlock-field-get-title field)))
-    (and field func title
-         (funcall func title))))
+  (when field
+    (let ((func (car gridlock-display-funcs))
+          (title (gridlock-field-get-title field)))
+      (and func title
+           (funcall func title)))))
 
 ;;;###autoload
 (defun gridlock-hide-title ()
@@ -150,9 +151,10 @@ The field stretches from BEG to END, with INDEX and value STR."
 
 (defun gridlock--hide-title-helper (field)
   "Hide info about the field FIELD."
-  (let ((func (cdr gridlock-display-funcs)))
-    (and field func
-         (funcall func (gridlock-field-get-title field)))))
+  (when field
+    (let ((func (cdr gridlock-display-funcs)))
+      (and func
+           (funcall func (gridlock-field-get-title field))))))
 
 ;;;###autoload
 (defun gridlock-choose-display-scheme ()
