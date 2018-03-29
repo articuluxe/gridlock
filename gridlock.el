@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-03-27 17:32:09 dharms>
+;; Modified Time-stamp: <2018-03-29 12:06:51 dan.harms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -117,8 +117,21 @@ Takes one parameter: FIELDS, a list of fields.")
   "Create a gridlock field.
 The field stretches from BEG to END, with INDEX and value STR."
   (gridlock-field :begin beg :end end :index index :string str))
+
+;; field creator for older emacsen, evaluated at compile to avoid a load-time
+;; warning on newer emacs
+(eval-when-compile
+  (defun gridlock-create-field-obsolete (beg end index str)
+    "Create a gridlock field.
+The field stretches from BEG to END, with INDEX and value STR.
+This is for older emacsen."
+    (gridlock-field "field" :begin beg :end end :index index :string str)))
+
 ;; field creator
-(defvar gridlock-create-field-func #'gridlock-create-field-default
+(defvar gridlock-create-field-func
+  (if (< emacs-major-version 25)
+      #'gridlock-create-field-obsolete
+    #'gridlock-create-field-default)
   "The default function to create a gridlock field.")
 
 ;;;###autoload
