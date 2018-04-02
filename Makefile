@@ -1,6 +1,6 @@
 EMACS=$(VISUAL) -nw
 ROOT=$(HOME)/.emacs.d
-DEPS=-L `pwd` -L $(ROOT)/plugins -L ../parsenv -L $(ROOT)/plugins/smart-mode-line -L $(ROOT)/elisp -L $(ROOT)/plugins/bookmark+ -L $(ROOT)/plugins/auto-complete -L $(ROOT)/plugins/swiper -L $(ROOT)/plugins/realgud
+DEPS=-L `pwd` -L $(ROOT)/plugins -L $(ROOT)/elisp -L $(ROOT)/plugins/auto-complete -L $(ROOT)/plugins/swiper
 ELC := $(patsubst %.el,%.elc,$(wildcard *.el))
 
 %.elc: %.el
