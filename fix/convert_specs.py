@@ -5,7 +5,7 @@
 # Author: Dan Harms <enniomore@icloud.com>
 # Created: Saturday, March 24, 2018
 # Version: 1.0
-# Modified Time-stamp: <2018-03-24 11:32:04 dharms>
+# Modified Time-stamp: <2018-04-02 17:44:17 dharms>
 # Modified by: Dan Harms
 # Keywords: python fix
 import csv
@@ -18,14 +18,15 @@ if len(sys.argv) < 2:
 
 infilename = sys.argv[1]
 file, ext = os.path.splitext(infilename)
-outfilename = file + '-out' + '.csv'
+outfilename = file + '-out' + '.hash'
 
 print "Converting", infilename, "to", outfilename
 
 with open(infilename, 'rb') as infile:
     rdr = csv.reader(infile, delimiter='\t')
     with open(outfilename, 'wb') as outfile:
-        outfile.write("Tag,Name,Type,Description,Added\n")
+        outfile.write("#s(hash-table size 500 test eql\n")
+        outfile.write(" rehash-size 1.5 rehash-threshold 0.8 data (\n")
         cols = []
         desc = ""
         i = 0
@@ -48,10 +49,16 @@ with open(infilename, 'rb') as infile:
             elif i == 2:
                 if row:
                     cols.append(row[0])
-                    outfile.write(','.join(cols))
-                    outfile.write('\n')
+                    desc = cols[3].replace('"', '\\"')
+                    outfile.write("%s \"%s [%s] %s (%s)\"\n" % (cols[0],
+                                                                cols[1],
+                                                                cols[2],
+                                                                desc,
+                                                                cols[4]))
                     cols = []
                     desc = ""
                     i = 0
+
+        outfile.write("\n))\n")
 
 # code ends here
