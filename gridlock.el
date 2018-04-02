@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-03-29 13:33:30 dan.harms>
+;; Modified Time-stamp: <2018-04-02 17:48:48 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -40,7 +40,7 @@
 (require 'gridlock-popup)
 (require 'gridlock-quickpeek)
 
-(defgroup gridlock nil
+(defgroup gridlock-group nil
   "Helper to navigate between fields, and explicate them."
   :group 'tools
   :prefix "gridlock")
