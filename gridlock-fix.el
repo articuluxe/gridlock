@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Thursday, March 22, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-03-27 17:41:27 dharms>
+;; Modified Time-stamp: <2018-04-02 17:48:48 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -32,41 +32,20 @@
 (defvar gridlock-fix-init-hook '()
   "Hooks run after setting up `gridlock-fix-mode' but before inspecting buffer.")
 
-(defvar-local gridlock-fix-metadata (make-hash-table :size 500)
+(defvar gridlock-fix-metadata nil
   "The metadata for this fix buffer.")
 
-(defun gridlock-fix--read-file-into-list-of-lines (file)
-  "Read FILE into a list of strings split line by line."
-  (interactive "f")
+(defun gridlock-fix-metadata-read-file (file)
+  "Read the value of `gridlock-fix-metadata' from FILE."
   (with-temp-buffer
     (insert-file-contents file)
-    (split-string (buffer-string) "\n" t)))
-
-(defun gridlock-fix-metadata-read-file (hash file)
-  "Insert into HASH fix metadata from FILE."
-  (let ((lines (gridlock-fix--read-file-into-list-of-lines file))
-        arr str)
-    (dolist (line (cdr lines) hash)
-      (setq arr (split-string line ","))
-      (setq str (format "%s (%s) %s %s"
-                        (nth 1 arr)
-                        (nth 2 arr)
-                        (nth 3 arr)
-                        (nth 4 arr)))
-      (puthash (string-to-number (nth 0 arr))
-               str hash))))
-
-(defun gridlock-fix-load-metadata-from-file (file)
-  "Read fix metadata from a csv file FILE."
-  (interactive "fInput csv file: ")
-  (if (file-exists-p file)
-      (gridlock-fix-metadata-read-file gridlock-fix-metadata file)
-    (error "%s does not exist" file)))
+    (setq gridlock-fix-metadata (read (current-buffer)))))
 
 (defcustom gridlock-fix-preferred-display-schemes
   '("popup" "pos-tip" "quick-peek" "echo")
   "Preferred display schemes for `gridlock-fix-mode'.
-Display schemes will be loaded in this order.")
+Display schemes will be loaded in this order."
+  :group 'gridlock-group)
 
 (defun gridlock-fix--reset-metadata ()
   "Reset the metadata associated with the current buffer in `gridlock-fix-mode'."
@@ -75,10 +54,13 @@ Display schemes will be loaded in this order.")
 
 (defun gridlock-fix--get-buffer-metadata ()
   "Initialize the buffer's metadata for `gridlock-fix-mode'."
-  ;; (gridlock-fix-metadata-read-file gridlock-fix-metadata
-  ;;                                  (concat load-file-name
-  ;;                                          "/fix4.2-out.csv"))
-  )
+  (if (featurep 'hashtable-print-readable)
+      (let ((file (locate-file "fix4.2-out.hash" load-path)))
+        (if (file-exists-p file)
+            (gridlock-fix-metadata-read-file file)
+          (error "%s does not exist" file)))
+    (error
+     "Gridlock Fix Metadata cannot be read in (hash tables are not serializable in this version of Emacs)")))
 
 ;; field class override for fix
 (defclass gridlock-fix-field (gridlock-field)
@@ -112,7 +94,9 @@ It stretches from BEG to END, has index INDEX, and value STR."
   "Return the title associated with FIELD."
   (let* ((tag (gridlock-fix-get-tag field))
          (str (gethash tag gridlock-fix-metadata)))
-    str))
+    (if (and str (not (string-empty-p str)))
+        str
+      "n/a")))
 
 (defun gridlock-fix-gather-titles (fields)
   "Return a list of all field headings in field list FIELDS."
