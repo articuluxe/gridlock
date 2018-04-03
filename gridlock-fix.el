@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Thursday, March 22, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-04-02 17:48:48 dharms>
+;; Modified Time-stamp: <2018-04-03 17:49:02 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -127,10 +127,10 @@ It stretches from BEG to END, has index INDEX, and value STR."
   :keymap gridlock-fix-mode-map
   (if gridlock-fix-mode
       (progn
-        (setq gridlock-anchor-regex "FIX\\.[45]")
+        (setq gridlock-anchor-regex "FIX\\.[45]\\.")
         (setq gridlock-field-delimiter "\x01")
-        (setq gridlock-field-regex-begin "\\(Send\\|Recv\\)([^)]+)")
-        (setq gridlock-field-regex-end "10=.+")
+        (setq gridlock-field-regex-begin "\\(8=\\)")
+        (setq gridlock-field-regex-end "\\(10=[:digit:]\\{3\\}\\)")
         (setq gridlock-metadata-get-title-func #'gridlock-fix-get-title)
         (setq gridlock-metadata-gather-titles-func #'gridlock-fix-gather-titles)
         (setq gridlock-create-field-func #'gridlock-fix-create-field)

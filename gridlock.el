@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-04-02 17:48:48 dharms>
+;; Modified Time-stamp: <2018-04-03 17:35:38 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -501,12 +501,16 @@ If none, return nil.  If some, return those fields."
              (not (string-empty-p gridlock-field-regex-begin))
              (goto-char (line-beginning-position))
              (search-forward-regexp gridlock-field-regex-begin end t)
-             (setq beg (or (match-end 0) beg))
+             (setq beg (or (match-beginning 1)
+                           (match-end 0)
+                           beg))
              (goto-char beg))
         (and gridlock-field-regex-end
              (not (string-empty-p gridlock-field-regex-end))
              (search-forward-regexp gridlock-field-regex-end end t)
-             (setq end (or (match-beginning 0) end))
+             (setq end (or (match-end 1)
+                           (match-beginning 0)
+                           end))
              ;; (message "pre: beg %d end %d" beg end)
              )
         (goto-char beg)

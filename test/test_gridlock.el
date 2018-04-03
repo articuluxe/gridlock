@@ -5,7 +5,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, February  2, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-03-21 17:38:37 dharms>
+;; Modified Time-stamp: <2018-04-03 17:40:05 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: test gridlock
 
@@ -274,6 +274,60 @@
         (gridlock-test-clear-field-regexps)
         ))))
 
+(ert-deftest gridlock-test-regex-capture ()
+  "Test gridlock parsing with non-empty regex capture groups."
+  (let (anchor fields field)
+    (cl-letf (((symbol-function 'gridlock--show-title-helper) (lambda(_)))
+              ((symbol-function 'gridlock--hide-title-helper) (lambda(_))))
+      (with-temp-buffer
+        (insert "One,Two,Three\nignore1,2,3me\nignore4,5,6me,,,")
+        (defun gridlock-csv-test-hook ()
+          (setq gridlock-anchor-regex "ore")
+          ;; regexes specify capture groups
+          (setq gridlock-field-regex-begin "e\\(1,\\)") ;start match at start of \1
+          (setq gridlock-field-regex-end "\\(,3\\)me")) ;stop match at end of \1
+        (unwind-protect
+            (progn
+              (add-hook 'gridlock-csv-init-hook 'gridlock-csv-test-hook)
+              (gridlock-csv-mode)
+              ;; go to before ignore regex
+              (goto-char 15)
+              (should (looking-at "ignore"))
+              (setq fields (gridlock--parse-line (point)))
+              (should (eq (length fields) 3))
+              (should (string= (gridlock-get-str (aref fields 0))
+                               "1"))
+              (should (string= (gridlock-get-str (aref fields 1))
+                               "2"))
+              (should (string= (gridlock-get-str (aref fields 2))
+                               "3"))
+              ;; go to middle of ignore regex
+              (goto-char 19)
+              (should (looking-at "re"))
+              (setq fields (gridlock--parse-line (point)))
+              (should (eq (length fields) 3))
+              (should (string= (gridlock-get-str (aref fields 0))
+                               "1"))
+              (should (string= (gridlock-get-str (aref fields 1))
+                               "2"))
+              (should (string= (gridlock-get-str (aref fields 2))
+                               "3"))
+              ;; go to end of ignore regex
+              (goto-char 21)
+              (should (looking-at "1"))
+              (setq fields (gridlock--parse-line (point)))
+              (should (eq (length fields) 3))
+              (should (string= (gridlock-get-str (aref fields 0))
+                               "1"))
+              (should (string= (gridlock-get-str (aref fields 1))
+                               "2"))
+              (should (string= (gridlock-get-str (aref fields 2))
+                               "3"))
+              (setq gridlock-anchor-regex "^")
+              (setq gridlock-field-regex-begin nil)
+              (setq gridlock-field-regex-end nil))
+          (remove-hook 'gridlock-csv-init-hook 'gridlock-csv-test-hook))
+        ))))
 
 (ert-run-tests-batch-and-exit (car argv))
 
