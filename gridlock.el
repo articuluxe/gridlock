@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-04-03 17:35:38 dharms>
+;; Modified Time-stamp: <2018-04-04 08:50:42 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -560,9 +560,9 @@ If none, return nil.  If some, return those fields."
         (while (< i len)
           (setq elt (aref fields i))
           (setq bounds (gridlock-get-bounds elt))
-          (when (and (>= pt (car bounds))
-                     (<= pt (cdr bounds)))
-            (throw 'found i))
+          (and (>= pt (car bounds))
+               (<= pt (cdr bounds))
+               (throw 'found i))
           (setq i (1+ i)))
         nil))))
 
@@ -582,9 +582,12 @@ If none, return nil.  If some, return those fields."
          (fields (gridlock-get-fields-at anchor))
          (idx (gridlock--lookup-field-at-pos fields point))
          next)
-    (and idx
-         (setq next (gridlock--get-next-field fields idx))
-         (aref fields next))))
+    (when (not (seq-empty-p fields))
+      (if idx
+          (progn
+            (setq next (gridlock--get-next-field fields idx))
+            (aref fields next))
+        (aref fields 0)))))
 
 (defun gridlock--get-next-field (fields idx)
   "Return the next field from FIELDS after IDX, if it exists."
