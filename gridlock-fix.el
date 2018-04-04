@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Thursday, March 22, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-04-03 17:49:02 dharms>
+;; Modified Time-stamp: <2018-04-04 08:51:47 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -96,7 +96,7 @@ It stretches from BEG to END, has index INDEX, and value STR."
          (str (gethash tag gridlock-fix-metadata)))
     (if (and str (not (string-empty-p str)))
         str
-      "n/a")))
+      "")))
 
 (defun gridlock-fix-gather-titles (fields)
   "Return a list of all field headings in field list FIELDS."
