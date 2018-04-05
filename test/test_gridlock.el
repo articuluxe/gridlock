@@ -5,7 +5,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, February  2, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-04-03 17:40:05 dharms>
+;; Modified Time-stamp: <2018-04-05 17:53:02 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: test gridlock
 
@@ -263,13 +263,15 @@
         (goto-char pt)
         (should (looking-at ","))
         (setq anchor (gridlock--find-anchor-on-line pt))
-        (should (eq (length fields) 3))
         (setq fields (gridlock-get-fields-at anchor))
+        (should (eq (length fields) 3))
         (setq field (aref fields 0))
         (should (string= (gridlock-get-str field) "1")) ;confirm we parsed field list
         (should (not (gridlock--lookup-field-at-pos fields pt)))      ;should be nil
         (should (not (gridlock-get-field-at pt)))
-        (should (not (gridlock-get-previous-field pt)))
+        (setq field (gridlock-get-previous-field pt))
+        (should (eq (gridlock-get-index field) 2))
+        (should (string= "3" (gridlock-get-str field)))
         (should (not (gridlock-get-next-field pt)))
         (gridlock-test-clear-field-regexps)
         ))))

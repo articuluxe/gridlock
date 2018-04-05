@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-04-04 08:50:42 dharms>
+;; Modified Time-stamp: <2018-04-05 17:53:44 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -550,8 +550,10 @@ If none, return nil.  If some, return those fields."
   "Return the fields, if any, existing on line associated with ANCHOR.."
   (ht-get gridlock-buffer-points anchor))
 
-(defun gridlock--lookup-field-at-pos (fields pt)
-  "Lookup in field list FIELDS what field, if any, PT is within."
+(defun gridlock--lookup-field-at-pos (fields pt &optional lax)
+  "Lookup in field list FIELDS what index, if any, PT lies within.
+If LAX is non-nil, PT is allowed to lie before the first, or
+after the last, field."
   (let ((len (length fields))
         (i 0)
         elt bounds)
@@ -560,8 +562,10 @@ If none, return nil.  If some, return those fields."
         (while (< i len)
           (setq elt (aref fields i))
           (setq bounds (gridlock-get-bounds elt))
-          (and (>= pt (car bounds))
-               (<= pt (cdr bounds))
+          (and (or (>= pt (car bounds))
+                   (and lax (eq i 0)))
+               (or (<= pt (cdr bounds))
+                   (and lax (eq i (1- len))))
                (throw 'found i))
           (setq i (1+ i)))
         nil))))
@@ -572,9 +576,15 @@ If none, return nil.  If some, return those fields."
          (fields (gridlock-get-fields-at anchor))
          (idx (gridlock--lookup-field-at-pos fields point))
          prev)
-    (and idx
-         (setq prev (gridlock--get-previous-field fields idx))
-         (aref fields prev))))
+    (if idx
+        (progn
+          (and
+           (setq prev (gridlock--get-previous-field fields idx))
+           (aref fields prev)))
+      (and fields
+           (>= point (cdr (gridlock-get-bounds (aref fields (1- (length fields))))))
+           (setq idx (gridlock--lookup-field-at-pos fields point 'lax))
+           (aref fields idx)))))
 
 (defun gridlock-get-next-field (point)
   "Return the field, if any, following that at POINT."
@@ -582,12 +592,15 @@ If none, return nil.  If some, return those fields."
          (fields (gridlock-get-fields-at anchor))
          (idx (gridlock--lookup-field-at-pos fields point))
          next)
-    (when (not (seq-empty-p fields))
-      (if idx
-          (progn
-            (setq next (gridlock--get-next-field fields idx))
-            (aref fields next))
-        (aref fields 0)))))
+    (if idx
+        (progn
+          (and
+           (setq next (gridlock--get-next-field fields idx))
+           (aref fields next)))
+      (and fields
+           (<= point (car (gridlock-get-bounds (aref fields 0))))
+           (setq idx (gridlock--lookup-field-at-pos fields point 'lax))
+           (aref fields idx)))))
 
 (defun gridlock--get-next-field (fields idx)
   "Return the next field from FIELDS after IDX, if it exists."
