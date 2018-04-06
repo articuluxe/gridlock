@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Tuesday, February 20, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-03-21 17:38:36 dharms>
+;; Modified Time-stamp: <2018-04-06 17:52:15 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -32,7 +32,8 @@
 (defcustom gridlock-csv-preferred-display-schemes
   '("popup" "pos-tip" "quick-peek" "echo")
   "Preferred display schemes for `gridlock-csv-mode'.
-Display schemes will be loaded in this order.")
+Display schemes will be loaded in this order."
+  :group 'gridlock-group)
 
 (defvar gridlock-csv-init-hook '()
   "Hooks run after setting up `gridlock-csv-mode' but before inspecting buffer.")
