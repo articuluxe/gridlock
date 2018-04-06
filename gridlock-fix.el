@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Thursday, March 22, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-04-04 08:51:47 dharms>
+;; Modified Time-stamp: <2018-04-06 08:33:50 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -35,17 +35,14 @@
 (defvar gridlock-fix-metadata nil
   "The metadata for this fix buffer.")
 
-(defun gridlock-fix-metadata-read-file (file)
-  "Read the value of `gridlock-fix-metadata' from FILE."
-  (with-temp-buffer
-    (insert-file-contents file)
-    (setq gridlock-fix-metadata (read (current-buffer)))))
-
 (defcustom gridlock-fix-preferred-display-schemes
   '("popup" "pos-tip" "quick-peek" "echo")
   "Preferred display schemes for `gridlock-fix-mode'.
 Display schemes will be loaded in this order."
   :group 'gridlock-group)
+
+(defvar gridlock-fix-metadata-file "fix4.2-out.hash"
+  "Data file to persist tag metadata.")
 
 (defun gridlock-fix--reset-metadata ()
   "Reset the metadata associated with the current buffer in `gridlock-fix-mode'."
@@ -55,12 +52,19 @@ Display schemes will be loaded in this order."
 (defun gridlock-fix--get-buffer-metadata ()
   "Initialize the buffer's metadata for `gridlock-fix-mode'."
   (if (featurep 'hashtable-print-readable)
-      (let ((file (locate-file "fix4.2-out.hash" load-path)))
-        (if (file-exists-p file)
+      (let ((file (locate-file gridlock-fix-metadata-file load-path)))
+        (if (and file (file-exists-p file))
             (gridlock-fix-metadata-read-file file)
-          (error "%s does not exist" file)))
+          (error "No metadata! (%s does not exist)"
+                 (or file gridlock-fix-metadata-file))))
     (error
      "Gridlock Fix Metadata cannot be read in (hash tables are not serializable in this version of Emacs)")))
+
+(defun gridlock-fix-metadata-read-file (file)
+  "Read the value of `gridlock-fix-metadata' from FILE."
+  (with-temp-buffer
+    (insert-file-contents file)
+    (setq gridlock-fix-metadata (read (current-buffer)))))
 
 ;; field class override for fix
 (defclass gridlock-fix-field (gridlock-field)
