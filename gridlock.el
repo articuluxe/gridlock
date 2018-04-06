@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-04-05 17:53:44 dharms>
+;; Modified Time-stamp: <2018-04-06 08:44:37 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -108,9 +108,13 @@ Takes one parameter: FIELDS, a list of fields.")
   "Get the field's string content."
   (oref field string))
 
-(defmethod gridlock-get-bounds ((field gridlock-field))
-  "Get the field's bounds, as a cons cell (BEG . END)."
-  (cons (oref field begin) (oref field end)))
+(defmethod gridlock-get-bounds-begin ((field gridlock-field))
+  "Get the field's beginning boundary."
+  (oref field begin))
+
+(defmethod gridlock-get-bounds-end ((field gridlock-field))
+  "Get the field's ending boundary."
+  (oref field end))
 
 ;; field creation helpers
 (defun gridlock-create-field-default (beg end index str)
@@ -219,7 +223,7 @@ LST is a list of display scheme names."
                               (t 0))))
             (gridlock--hide-title-helper gridlock-current-field)
             (setq gridlock-current-field (aref fields (1- idx)))
-            (goto-char (car (gridlock-get-bounds gridlock-current-field))))
+            (goto-char (gridlock-get-bounds-begin gridlock-current-field)))
         (gridlock--show-title-helper gridlock-current-field)))))
 
 (defun gridlock-jump-to-field-by-heading ()
@@ -249,7 +253,7 @@ LST is a list of display scheme names."
               (throw 'exit nil))
             (gridlock--hide-title-helper gridlock-current-field)
             (setq gridlock-current-field (aref fields idx))
-            (goto-char (car (gridlock-get-bounds gridlock-current-field))))
+            (goto-char (gridlock-get-bounds-begin gridlock-current-field)))
         (gridlock--show-title-helper gridlock-current-field)))))
 
 (defun gridlock-jump-to-field-by-content ()
@@ -278,7 +282,7 @@ LST is a list of display scheme names."
               (throw 'exit nil))
             (gridlock--hide-title-helper gridlock-current-field)
             (setq gridlock-current-field (aref fields idx))
-            (goto-char (car (gridlock-get-bounds gridlock-current-field))))
+            (goto-char (gridlock-get-bounds-begin gridlock-current-field)))
         (gridlock--show-title-helper gridlock-current-field)))))
 
 (defun gridlock--find-anchor-on-line (pt)
@@ -342,7 +346,7 @@ LST is a list of display scheme names."
                               idx
                             (1- (length fields))))
                 (setq gridlock-current-field (aref fields idx))
-                (throw 'found (car (gridlock-get-bounds gridlock-current-field))))
+                (throw 'found (gridlock-get-bounds-begin gridlock-current-field)))
             (setq pt beg)
             (goto-char (1+ beg))
             (setq beg
@@ -394,7 +398,7 @@ LST is a list of display scheme names."
                               idx
                             (1- (length fields))))
                 (setq gridlock-current-field (aref fields idx))
-                (throw 'found (car (gridlock-get-bounds gridlock-current-field))))
+                (throw 'found (gridlock-get-bounds-begin gridlock-current-field)))
             (setq pt beg)
             (goto-char (1- beg))
             (setq beg (if (eq (point) beg)
@@ -422,7 +426,7 @@ LST is a list of display scheme names."
          (fields (gridlock-get-fields-at anchor)))
     (when (> (length fields) 0)
       (setq gridlock-current-field (aref fields 0))
-      (car (gridlock-get-bounds gridlock-current-field)))))
+      (gridlock-get-bounds-begin gridlock-current-field))))
 
 ;;;###autoload
 (defun gridlock-goto-line-end ()
@@ -445,7 +449,7 @@ LST is a list of display scheme names."
          (len (length fields)))
     (when (> len 0)
       (setq gridlock-current-field (aref fields (1- len)))
-      (car (gridlock-get-bounds gridlock-current-field)))))
+      (gridlock-get-bounds-begin gridlock-current-field))))
 
 ;;;###autoload
 (defun gridlock-goto-next-field ()
@@ -457,7 +461,7 @@ LST is a list of display scheme names."
         (progn
           (gridlock--hide-title-helper prior)
           (setq gridlock-current-field fld)
-          (goto-char (car (gridlock-get-bounds fld)))
+          (goto-char (gridlock-get-bounds-begin fld))
           (gridlock--show-title-helper gridlock-current-field))
       ;; todo allow wrap-around to next line
       (message "No further fields on this line.")
@@ -473,7 +477,7 @@ LST is a list of display scheme names."
         (progn
           (gridlock--hide-title-helper prior)
           (setq gridlock-current-field fld)
-          (goto-char (car (gridlock-get-bounds fld)))
+          (goto-char (gridlock-get-bounds-begin fld))
           (gridlock--show-title-helper gridlock-current-field))
       (message "No further fields on this line.")
       (gridlock--show-title-helper gridlock-current-field))))
@@ -556,15 +560,16 @@ If LAX is non-nil, PT is allowed to lie before the first, or
 after the last, field."
   (let ((len (length fields))
         (i 0)
-        elt bounds)
+        elt min max)
     (catch 'found
       (progn
         (while (< i len)
           (setq elt (aref fields i))
-          (setq bounds (gridlock-get-bounds elt))
-          (and (or (>= pt (car bounds))
+          (setq min (gridlock-get-bounds-begin elt))
+          (setq max (gridlock-get-bounds-end elt))
+          (and (or (>= pt min)
                    (and lax (eq i 0)))
-               (or (<= pt (cdr bounds))
+               (or (<= pt max)
                    (and lax (eq i (1- len))))
                (throw 'found i))
           (setq i (1+ i)))
@@ -582,7 +587,7 @@ after the last, field."
            (setq prev (gridlock--get-previous-field fields idx))
            (aref fields prev)))
       (and fields
-           (>= point (cdr (gridlock-get-bounds (aref fields (1- (length fields))))))
+           (>= point (gridlock-get-bounds-end (aref fields (1- (length fields)))))
            (setq idx (gridlock--lookup-field-at-pos fields point 'lax))
            (aref fields idx)))))
 
@@ -598,7 +603,7 @@ after the last, field."
            (setq next (gridlock--get-next-field fields idx))
            (aref fields next)))
       (and fields
-           (<= point (car (gridlock-get-bounds (aref fields 0))))
+           (<= point (gridlock-get-bounds-begin (aref fields 0)))
            (setq idx (gridlock--lookup-field-at-pos fields point 'lax))
            (aref fields idx)))))
 
