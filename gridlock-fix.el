@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Thursday, March 22, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-04-06 08:33:50 dharms>
+;; Modified Time-stamp: <2018-04-06 08:54:57 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -41,7 +41,7 @@
 Display schemes will be loaded in this order."
   :group 'gridlock-group)
 
-(defvar gridlock-fix-metadata-file "fix4.2-out.hash"
+(defvar gridlock-fix-metadata-file "fix4.2.hash"
   "Data file to persist tag metadata.")
 
 (defun gridlock-fix--reset-metadata ()
