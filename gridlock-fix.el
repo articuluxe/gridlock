@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Thursday, March 22, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-04-06 08:54:57 dharms>
+;; Modified Time-stamp: <2018-04-10 08:41:07 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -78,13 +78,22 @@ Display schemes will be loaded in this order."
   "Get the fix tag number associated with FIELD."
   (oref field tag))
 
-(defun gridlock-fix-create-field (beg end index str)
-  "Create a gridlock-fix-field instance with the associated values.
-It stretches from BEG to END, has index INDEX, and value STR."
-  (let ((field (gridlock-fix-field
-                :begin beg :end end
-                :index index))
-        (values (split-string str "="))
+(defmacro gridlock-fix-create-field-macro (&rest args)
+  "Create a `gridlock-fix-field' with ARGS, parameterized on Emacs version.
+This is necessary as constructor arguments changed in Emacs 25."
+  (if (version< emacs-version "25")
+      `(apply gridlock-fix-field "gridlock-fix" ,@args)
+    `(apply gridlock-fix-field ,@args)))
+
+(defun gridlock-fix-create-field-compat (args)
+  "Create a `gridlock-fix-field' according to ARGS."
+  (gridlock-fix-create-field-macro args))
+
+(defun gridlock-fix-create-field (&rest args)
+  "Create a gridlock-fix-field instance with associated values ARGS."
+  (let* ((field (gridlock-fix-create-field-compat args))
+         (str (gridlock-get-str field))
+         (values (split-string str "="))
         tag value)
     (setq tag (string-to-number (car values)))
     (when (> tag 0)

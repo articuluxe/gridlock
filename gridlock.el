@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-04-06 08:44:37 dharms>
+;; Modified Time-stamp: <2018-04-10 08:41:05 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -116,25 +116,20 @@ Takes one parameter: FIELDS, a list of fields.")
   "Get the field's ending boundary."
   (oref field end))
 
-;; field creation helpers
-(defun gridlock-create-field-default (beg end index str)
-  "Create a gridlock field.
-The field stretches from BEG to END, with INDEX and value STR."
-  (gridlock-field :begin beg :end end :index index :string str))
+(defmacro gridlock-create-field-macro (&rest args)
+  "Create a `gridlock-field' with ARGS, parameterized on Emacs version.
+This is necessary as constructor arguments changed in Emacs 25."
+  (if (version< emacs-version "25")
+      `(apply gridlock-field "gridlock-field" ,@args)
+    `(apply gridlock-field ,@args)))
 
-;; field creator for older emacsen, evaluated at compile to avoid a load-time
-;; warning on newer emacs
-  (defun gridlock-create-field-obsolete (beg end index str)
-    "Create a gridlock field.
-The field stretches from BEG to END, with INDEX and value STR.
-This is for older emacsen."
-    (gridlock-field "field" :begin beg :end end :index index :string str))
+(defun gridlock-create-field-compat (&rest args)
+  "Create a `gridlock-field' with ARGS."
+  (gridlock-create-field-macro args))
 
 ;; field creator
 (defvar gridlock-create-field-func
-  (if (< emacs-major-version 25)
-      #'gridlock-create-field-obsolete
-    #'gridlock-create-field-default)
+  #'gridlock-create-field-compat
   "The default function to create a gridlock field.")
 
 ;;;###autoload
@@ -524,14 +519,16 @@ If none, return nil.  If some, return those fields."
                      pt (match-beginning 0)))
           ;; (message "during: bounds: (%d,%d) end is %d, str is %s" pt (match-beginning 0) end str)
           (push
-           (funcall gridlock-create-field-func pt (match-beginning 0) idx str)
+           (funcall gridlock-create-field-func
+                    :begin pt :end (match-beginning 0) :index idx :string str)
            lst)
           (setq idx (1+ idx))
           (setq pt (point)))
         (setq str (string-trim (buffer-substring-no-properties pt end)))
         ;; (message "post: end pt is %d, end is %d, str is %s" pt end str)
         (push
-         (funcall gridlock-create-field-func pt (+ pt (length str)) idx str)
+         (funcall gridlock-create-field-func
+                  :begin pt :end (+ pt (length str)) :index idx :string str)
          lst)
         (setq vec (make-vector (length lst) nil))
         (dolist (elt (nreverse lst) vec)
