@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Thursday, March 22, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-04-10 08:41:07 dharms>
+;; Modified Time-stamp: <2018-04-11 13:03:07 dan.harms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -141,7 +141,7 @@ This is necessary as constructor arguments changed in Emacs 25."
   (if gridlock-fix-mode
       (progn
         (setq gridlock-anchor-regex "FIX\\.[45]\\.")
-        (setq gridlock-field-delimiter "\x01")
+        (setq gridlock-field-delimiter "\x01\\||")
         (setq gridlock-field-regex-begin "\\(8=\\)")
         (setq gridlock-field-regex-end "\\(10=[:digit:]\\{3\\}\\)")
         (setq gridlock-metadata-get-title-func #'gridlock-fix-get-title)
