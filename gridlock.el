@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-04-10 08:41:05 dharms>
+;; Modified Time-stamp: <2018-04-11 08:34:06 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -32,18 +32,71 @@
 (require 'seq)
 (require 'eieio)
 
-(defvar gridlock-display-schemes nil
-  "List of display schemes capable of being used by `gridlock-mode'.")
-
-(require 'gridlock-echo)
-(require 'gridlock-postip)
-(require 'gridlock-popup)
-(require 'gridlock-quickpeek)
-
 (defgroup gridlock-group nil
   "Helper to navigate between fields, and explicate them."
   :group 'tools
   :prefix "gridlock")
+
+(defvar gridlock-display-schemes nil
+  "List of display schemes capable of being used by `gridlock-mode'.")
+
+;; display schemes
+;; echo
+(defun gridlock-echo-on (str)
+  "Show STR (the gridlock cell's title) to the user via the minibuffer."
+  (message str))
+
+(defun gridlock-echo-off (str)
+  "Stop showing field info STR to the user."
+  nil)
+
+(push (cons "echo" (cons #'gridlock-echo-on #'gridlock-echo-off))
+      gridlock-display-schemes)
+
+;; postip
+(declare-function pos-tip-show "pos-tip")
+(defun gridlock-postip-on (str)
+  "Show STR (the gridlock cell's title) to the user via `pos-tip-show'."
+  (pos-tip-show str))
+
+(defun gridlock-postip-off (str)
+  "Stop showing field info STR to the user."
+  nil)
+
+(and (require 'pos-tip nil t)
+     (display-graphic-p)
+     (push (cons "pos-tip" (cons #'gridlock-postip-on #'gridlock-postip-off))
+           gridlock-display-schemes))
+
+;; popup
+(declare-function popup-tip "popup")
+(defun gridlock-popup-on (str)
+  "Show STR (the gridlock cell's title) to the user via `popup-tip'."
+  (popup-tip str))
+
+(defun gridlock-popup-off (str)
+  "Stop showing field info STR to the user."
+  nil)
+
+(when (require 'popup nil t)
+  (push (cons "popup" (cons #'gridlock-popup-on #'gridlock-popup-off))
+        gridlock-display-schemes))
+
+;; quickpeek
+(declare-function quick-peek-show "quick-peek")
+(defun gridlock-quickpeek-on (str)
+  "Show STR (the gridlock cell's title) to the user via `quick-peek-show'."
+  (quick-peek-show str))
+
+(declare-function quick-peek-hide "quick-peek")
+(defun gridlock-quickpeek-off (str)
+  "Stop showing field info STR to the user."
+  (quick-peek-hide))
+
+(when (require 'quick-peek nil t)
+  (push (cons "quick-peek" (cons #'gridlock-quickpeek-on #'gridlock-quickpeek-off))
+        gridlock-display-schemes))
+
 
 (defvar-local gridlock-buffer-points
   (ht-create 'eq)
@@ -98,6 +151,9 @@ Takes one parameter: FIELDS, a list of fields.")
         )
    )
   "A field of interest.")
+
+;; silence compiler warning
+(eval-when-compile (defvar gridlock-field))
 
 ;; field accessors
 (defmethod gridlock-get-index ((field gridlock-field))

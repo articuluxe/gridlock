@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Thursday, March 22, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-04-11 13:03:07 dan.harms>
+;; Modified Time-stamp: <2018-04-12 06:02:41 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -73,6 +73,9 @@ Display schemes will be loaded in this order."
         :type (integer 0 *)
         :documentation "The fix tag's numeric value."))
   "A fix field of interest.")
+
+;; silence compiler warning
+(eval-when-compile (defvar gridlock-fix-field))
 
 (defmethod gridlock-fix-get-tag ((field gridlock-fix-field))
   "Get the fix tag number associated with FIELD."
