@@ -3,11 +3,11 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-04-11 08:34:06 dharms>
+;; Modified Time-stamp: <2018-04-12 08:12:37 dharms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
-;; Package-Requires: ((emacs "24.4"))
+;; Package-Requires: ((emacs "25.1") (ht "2.1") (cl-lib "0.5") (cl-generic "0.3"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -27,6 +27,8 @@
 ;;
 
 ;;; Code:
+(require 'cl-lib)
+(require 'cl-generic)
 (require 'subr-x)
 (require 'ht)
 (require 'seq)
@@ -156,19 +158,19 @@ Takes one parameter: FIELDS, a list of fields.")
 (eval-when-compile (defvar gridlock-field))
 
 ;; field accessors
-(defmethod gridlock-get-index ((field gridlock-field))
+(cl-defmethod gridlock-get-index ((field gridlock-field))
   "Get the field's index in its containing line."
   (oref field index))
 
-(defmethod gridlock-get-str ((field gridlock-field))
+(cl-defmethod gridlock-get-str ((field gridlock-field))
   "Get the field's string content."
   (oref field string))
 
-(defmethod gridlock-get-bounds-begin ((field gridlock-field))
+(cl-defmethod gridlock-get-bounds-begin ((field gridlock-field))
   "Get the field's beginning boundary."
   (oref field begin))
 
-(defmethod gridlock-get-bounds-end ((field gridlock-field))
+(cl-defmethod gridlock-get-bounds-end ((field gridlock-field))
   "Get the field's ending boundary."
   (oref field end))
 
