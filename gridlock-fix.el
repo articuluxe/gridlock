@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Thursday, March 22, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-04-12 08:10:41 dharms>
+;; Modified Time-stamp: <2018-04-19 16:49:18 dan.harms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -77,7 +77,7 @@ Display schemes will be loaded in this order."
 ;; silence compiler warning
 (eval-when-compile (defvar gridlock-fix-field))
 
-(cl-defmethod gridlock-fix-get-tag ((field gridlock-fix-field))
+(gridlock--defmethod-macro gridlock-fix-get-tag ((field gridlock-fix-field))
   "Get the fix tag number associated with FIELD."
   (oref field tag))
 

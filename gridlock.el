@@ -3,7 +3,7 @@
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-04-12 08:12:37 dharms>
+;; Modified Time-stamp: <2018-04-19 17:02:17 dan.harms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
@@ -28,7 +28,6 @@
 
 ;;; Code:
 (require 'cl-lib)
-(require 'cl-generic)
 (require 'subr-x)
 (require 'ht)
 (require 'seq)
@@ -157,20 +156,28 @@ Takes one parameter: FIELDS, a list of fields.")
 ;; silence compiler warning
 (eval-when-compile (defvar gridlock-field))
 
+(defmacro gridlock--defmethod-macro (&rest args)
+  "Define a macro wrapper around `defmethod', passing ARGS.
+This is necessary to abstract api differences between Emacs 24
+and 25, the latter of which introduced `cl-defmethod'."
+  (if (version< emacs-version "25")
+      `(defmethod ,@args)
+    `(cl-defmethod ,@args)))
+
 ;; field accessors
-(cl-defmethod gridlock-get-index ((field gridlock-field))
+(gridlock--defmethod-macro gridlock-get-index ((field gridlock-field))
   "Get the field's index in its containing line."
   (oref field index))
 
-(cl-defmethod gridlock-get-str ((field gridlock-field))
+(gridlock--defmethod-macro gridlock-get-str ((field gridlock-field))
   "Get the field's string content."
   (oref field string))
 
-(cl-defmethod gridlock-get-bounds-begin ((field gridlock-field))
+(gridlock--defmethod-macro gridlock-get-bounds-begin ((field gridlock-field))
   "Get the field's beginning boundary."
   (oref field begin))
 
-(cl-defmethod gridlock-get-bounds-end ((field gridlock-field))
+(gridlock--defmethod-macro gridlock-get-bounds-end ((field gridlock-field))
   "Get the field's ending boundary."
   (oref field end))
 
