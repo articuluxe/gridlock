@@ -1,9 +1,9 @@
-;;; gridlock.el --- navigate among delimited fields
-;; Copyright (C) 2018  Dan Harms (dharms)
+;;; gridlock.el --- Navigate among delimited fields
+;; Copyright (C) 2018-2019  Dan Harms (dharms)
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Friday, January 26, 2018
 ;; Version: 0.1
-;; Modified Time-stamp: <2018-04-19 17:02:17 dan.harms>
+;; Modified Time-stamp: <2019-07-24 10:51:13 dan.harms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
