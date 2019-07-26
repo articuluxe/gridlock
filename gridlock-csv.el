@@ -1,9 +1,9 @@
-;;; gridlock-csv.el --- gridlock for csv-mode
-;; Copyright (C) 2018  Dan Harms (dharms)
+;;; gridlock-csv.el --- Gridlock for csv-mode
+;; Copyright (C) 2018-2019  Dan Harms (dharms)
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Tuesday, February 20, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-04-06 17:52:15 dharms>
+;; Modified Time-stamp: <2019-07-26 15:58:43 dan.harms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git

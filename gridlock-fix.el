@@ -1,9 +1,9 @@
-;;; gridlock-fix.el --- gridlock for fix
-;; Copyright (C) 2018  Dan Harms (dharms)
+;;; gridlock-fix.el --- Gridlock for fix
+;; Copyright (C) 2018-2019  Dan Harms (dharms)
 ;; Author: Dan Harms <enniomore@icloud.com>
 ;; Created: Thursday, March 22, 2018
 ;; Version: 1.0
-;; Modified Time-stamp: <2018-04-19 16:49:18 dan.harms>
+;; Modified Time-stamp: <2019-07-26 15:59:47 dan.harms>
 ;; Modified by: Dan Harms
 ;; Keywords: tools
 ;; URL: https://github.com/articuluxe/gridlock.git
