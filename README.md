@@ -166,6 +166,7 @@ Interactively choose a field to jump to, by heading/title.
 
 Interactively choose a field to jump to, by content.
 
-
+## CI ##
+![CI](https://github.com/articuluxe/gridlock/workflows/CI/badge.svg)
 
 
