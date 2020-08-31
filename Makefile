@@ -1,21 +1,56 @@
-EMACS=$(VISUAL) -nw
-ROOT=$(HOME)/.emacs.d
-DEPS=-L `pwd` -L $(ROOT)/plugins -L $(ROOT)/elisp -L $(ROOT)/plugins/auto-complete -L $(ROOT)/plugins/swiper
-ELC := $(patsubst %.el,%.elc,$(wildcard *.el))
+# * makem.sh/Makefile --- Script to aid building and testing Emacs Lisp packages
 
-%.elc: %.el
-	$(EMACS) -Q -batch $(DEPS) -f batch-byte-compile $<
+# This Makefile is from the makem.sh repo: <https://github.com/alphapapa/makem.sh>.
 
-compile: $(ELC)
+# * Arguments
 
-clean:
-	rm $(ELC)
+# For consistency, we use only var=val options, not hyphen-prefixed options.
 
-test:
-	@for idx in test/test_*; do \
-		printf '* %s\n' $$idx ; \
-		./$$idx $(DEPS) ; \
-		[ $$? -ne 0 ] && exit 1 ; \
-	done; :
+# NOTE: I don't like duplicating the arguments here and in makem.sh,
+# but I haven't been able to find a way to pass arguments which
+# conflict with Make's own arguments through Make to the script.
+# Using -- doesn't seem to do it.
 
-.PHONY: compile clean test
+ifdef install-deps
+	INSTALL_DEPS = "--install-deps"
+endif
+ifdef install-linters
+	INSTALL_LINTERS = "--install-linters"
+endif
+
+ifdef sandbox
+	ifeq ($(sandbox), t)
+		SANDBOX = --sandbox
+	else
+		SANDBOX = --sandbox=$(sandbox)
+	endif
+endif
+
+ifdef debug
+	DEBUG = "--debug"
+endif
+
+# ** Verbosity
+
+# Since the "-v" in "make -v" gets intercepted by Make itself, we have
+# to use a variable.
+
+verbose = $(v)
+
+ifneq (,$(findstring vv,$(verbose)))
+	VERBOSE = "-vv"
+else ifneq (,$(findstring v,$(verbose)))
+	VERBOSE = "-v"
+endif
+
+# * Rules
+
+# TODO: Handle cases in which "test" or "tests" are called and a
+# directory by that name exists, which can confuse Make.
+
+%:
+	@./makem.sh $(DEBUG) $(VERBOSE) $(SANDBOX) $(INSTALL_DEPS) $(INSTALL_LINTERS) $(@)
+
+.DEFAULT: init
+init:
+	@./makem.sh $(DEBUG) $(VERBOSE) $(SANDBOX) $(INSTALL_DEPS) $(INSTALL_LINTERS)
