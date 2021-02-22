@@ -1,0 +1,2075 @@
+Tag	Field Name	Data Type	Union Datatype	Description	Added	Depr.	Enums from tag
+1	Account	String		
+Account mnemonic as agreed between broker and institution.
+
+
+Added  FIX.2.7		
+2	AdvId	String		
+Unique identifier of advertisement message.
+(Prior to FIX 4.1 this field was of type int)
+
+
+Added  FIX.2.7		
+3	AdvRefID	String		
+Reference identifier used with CANCEL and REPLACE transaction types.
+(Prior to FIX 4.1 this field was of type int)
+
+
+Added  FIX.2.7		
+4	AdvSide	Char		
+Broker's side of advertised trade
+
+
+Added  FIX.2.7		
+5	AdvTransType	String		
+Identifies advertisement message transaction type
+
+
+Added  FIX.2.7		
+6	AvgPx	Price		
+Calculated average price of all fills on this order.
+
+
+Added  FIX.2.7		
+7	BeginSeqNo	int		
+Message sequence number of first message in range to be resent
+
+
+Added  FIX.2.7		
+8	BeginString	String		
+Identifies beginning of new message and protocol version. ALWAYS FIRST FIELD IN MESSAGE. (Always unencrypted)
+
+
+Added  FIX.2.7		
+9	BodyLength	int		
+Message length, in bytes, forward to the CheckSum field. ALWAYS SECOND FIELD IN MESSAGE. (Always unencrypted)
+
+
+Added  FIX.2.7		
+10	CheckSum	String		
+Three byte, simple checksum (see Appendix B: CheckSum Calculation for description). ALWAYS LAST FIELD IN MESSAGE; i.e. serves, with the trailing <SOH>, as the end-of-message delimiter. Always defined as three characters. (Always unencrypted)
+
+
+Added  FIX.2.7		
+11	ClOrdID	String		
+Unique identifier for Order as assigned by institution (identified by SenderCompID or OnBehalfOfCompID as appropriate). Uniqueness must be guaranteed within a single trading day. Firms, particularly those which electronically submit multi-day orders, trade globally or throughout market close periods,should ensure uniqueness across days, for example by embedding a date within the ClOrdID field.
+
+
+Added  FIX.2.7		
+12	Commission	Amt		
+Commission. Note if CommType is percentage, Commission of 5% should be represented as .05.
+
+
+Added  FIX.2.7		
+13	CommType	char		
+Commission type
+
+
+Added  FIX.2.7		
+14	CumQty	Qty		
+Total number of shares filled.
+(Prior to FIX 4.2 this field was of type int)
+
+
+Added  FIX.2.7		
+15	Currency	Currency		
+Identifies currency used for price. Absence of this field is interpreted as the default for the security. It is recommended that systems provide the currency value whenever possible. See Appendix A: Valid Currency Codes for information on obtaining valid values.
+
+
+Added  FIX.2.7		
+16	EndSeqNo	int		
+Message sequence number of last message in range to be resent. If request is for a single message BeginSeqNo = EndSeqNo. If request is for all messages subsequent to a particular message, EndSeqNo = "0" (representing infinity).
+
+
+Added  FIX.2.7		
+17	ExecID	String		
+Unique identifier of execution message as assigned by broker (will be 0 (zero) for ExecTransType=3 (Status)).
+Uniqueness must be guaranteed within a single trading day or the life of a multi-day order. Firms which accept multi-day orders should consider embedding a date within the ExecID field to assure uniqueness across days.
+(Prior to FIX 4.1 this field was of type int)
+
+
+Added  FIX.2.7		
+18	ExecInst	MultipleValueString		
+Instructions for order handling on exchange trading floor. If more than one instruction is applicable to an order, this field can contain multiple instructions separated by space.
+
+
+Added  FIX.2.7		
+19	ExecRefID	String		
+Reference identifier used with Cancel and Correct transaction types.
+(Prior to FIX 4.1 this field was of type int)
+
+
+Added  FIX.2.7		
+20	ExecTransType	char		
+Identifies transaction type
+
+
+Added  FIX.2.7		
+21	HandlInst	char		
+Instructions for order handling on Broker trading floor
+
+
+Added  FIX.2.7		
+22	IDSource	String		
+Identifies class of alternative SecurityID
+
+
+Added  FIX.2.7		
+23	IOIid	String		
+Unique identifier of IOI message.
+(Prior to FIX 4.1 this field was of type int)
+
+
+Added  FIX.2.7		
+24	IOIOthSvc	char		
+
+Added  FIX.2.7	FIX.4.2	
+25	IOIQltyInd	char		
+Relative quality of indication
+
+
+Added  FIX.2.7		
+26	IOIRefID	String		
+Reference identifier used with CANCEL and REPLACE, transaction types.
+(Prior to FIX 4.1 this field was of type int)
+
+
+Added  FIX.2.7		
+27	IOIShares	String		
+Number of shares in numeric or relative size.
+
+
+Added  FIX.2.7		
+28	IOITransType	char		
+Identifies IOI message transaction type
+
+
+Added  FIX.2.7		
+29	LastCapacity	char		
+Broker capacity in order execution
+
+
+Added  FIX.2.7		
+30	LastMkt	Exchange		
+Market of execution for last fill
+
+
+Added  FIX.2.7		
+31	LastPx	Price		
+Price of this (last) fill. Field not required for ExecTransType = 3 (Status)
+
+
+Added  FIX.2.7		
+32	LastShares	Qty		
+Quantity of shares bought/sold on this (last) fill. Field not required for ExecTransType = 3 (Status)
+(Prior to FIX 4.2 this field was of type int)
+
+
+Added  FIX.2.7		
+33	LinesOfText	int		
+Identifies number of lines of text body
+
+
+Added  FIX.2.7		
+34	MsgSeqNum	int		
+Integer message sequence number.
+
+
+Added  FIX.2.7		
+35	MsgType	String		
+Defines message type. ALWAYS THIRD FIELD IN MESSAGE. (Always unencrypted)
+Note: A "U" as the first character in the MsgType field (i.e. U1, U2, etc) indicates that the message format is privately defined between the sender and receiver.
+
+
+Added  FIX.2.7		
+36	NewSeqNo	int		
+New sequence number
+
+
+Added  FIX.2.7		
+37	OrderID	String		
+Unique identifier for Order as assigned by broker. Uniqueness must be guaranteed within a single trading day. Firms which accept multi-day orders should consider embedding a date within the OrderID field to assure uniqueness across days.
+
+
+Added  FIX.2.7		
+38	OrderQty	Qty		
+Number of shares ordered. This represents the number of shares for equities or based on normal convention the number of contracts for options, futures, convertible bonds, etc.
+(Prior to FIX 4.2 this field was of type int)
+
+
+Added  FIX.2.7		
+39	OrdStatus	char		
+Identifies current status of order.
+
+
+Added  FIX.2.7		
+40	OrdType	char		
+Order type.
+
+
+Added  FIX.2.7		
+41	OrigClOrdID	String		
+ClOrdID of the previous order (NOT the initial order of the day) as assigned by the institution, used to identify the previous order in cancel and cancel/replace requests.
+
+
+Added  FIX.2.7		
+42	OrigTime	UTCTimestamp		
+Time of message origination (always expressed in UTC (Universal Time Coordinated, also known as "GMT"))
+
+
+Added  FIX.2.7		
+43	PossDupFlag	Boolean		
+Indicates possible retransmission of message with this sequence number
+
+
+Added  FIX.2.7		
+44	Price	Price		
+Price per share
+
+
+Added  FIX.2.7		
+45	RefSeqNum	int		
+Reference message sequence number
+
+
+Added  FIX.2.7		
+46	RelatdSym	String		
+Symbol of issue related to story. Can be repeated within message to identify multiple companies.
+
+
+Added  FIX.2.7		
+47	Rule80A	char		
+Note that the name of this field is changing to "OrderCapacity" as Rule80A is a very US market-specific term. Other world markets need to convey similar information, however, often a subset of the US values. . See the "Rule80A (aka OrderCapacity) Usage by Market" appendix for market-specific usage of this field.
+
+
+Added  FIX.2.7		
+48	SecurityID	String		
+CUSIP or other alternate security identifier
+
+
+Added  FIX.2.7		
+49	SenderCompID	String		
+Assigned value used to identify firm sending message.
+
+
+Added  FIX.2.7		
+50	SenderSubID	String		
+Assigned value used to identify specific message originator (desk, trader, etc.)
+
+
+Added  FIX.2.7		
+51	SendingDate	LocalMktDate		
+No longer used. Included here for reference to prior versions.
+
+
+Added  FIX.2.7	FIX.4.0	
+52	SendingTime	UTCTimestamp		
+Time of message transmission (always expressed in UTC (Universal Time Coordinated, also known as "GMT")
+
+
+Added  FIX.2.7		
+53	Shares	Qty		
+Number of shares
+(Prior to FIX 4.2 this field was of type int)
+
+
+Added  FIX.2.7		
+54	Side	char		
+Side of order
+
+
+Added  FIX.2.7		
+55	Symbol	String		
+Ticker symbol
+
+
+Added  FIX.2.7		
+56	TargetCompID	String		
+Assigned value used to identify receiving firm.
+
+
+Added  FIX.2.7		
+57	TargetSubID	String		
+Assigned value used to identify specific individual or unit intended to receive message. "ADMIN" reserved for administrative messages not intended for a specific user.
+
+
+Added  FIX.2.7		
+58	Text	String		
+Free format text string
+(Note: this field does not have a specified maximum length)
+
+
+Added  FIX.2.7		
+59	TimeInForce	char		
+Specifies how long the order remains in effect. Absence of this field is interpreted as DAY.
+
+
+Added  FIX.2.7		
+60	TransactTime	UTCTimestamp		
+Time of execution/order creation (expressed in UTC (Universal Time Coordinated, also known as "GMT")
+
+
+Added  FIX.2.7		
+61	Urgency	char		
+Urgency flag
+
+
+Added  FIX.2.7		
+62	ValidUntilTime	UTCTimestamp		
+Indicates expiration time of indication message (always expressed in UTC (Universal Time Coordinated, also known as "GMT")
+
+
+Added  FIX.2.7		
+63	SettlmntTyp	char		
+Indicates order settlement period. Absence of this field is interpreted as Regular. Regular is defined as the default settlement period for the particular security on the exchange of execution.
+
+
+Added  FIX.2.7		
+64	FutSettDate	LocalMktDate		
+Specific date of trade settlement (SettlementDate) in YYYYMMDD format. Required when SettlmntTyp = 6 (Future) or SettlmntTyp = 8 (Sellers Option). (expressed in local time at place of settlement)
+
+
+Added  FIX.2.7		
+65	SymbolSfx	String		
+Additional information about the security (e.g. preferred, warrants, etc.). Note also see SecurityType.
+Valid values:
+As defined in the NYSE Stock and bond Symbol Directory and in the AMEX Fitch Directory
+
+
+Added  FIX.2.7		
+66	ListID	String		
+Unique identifier for list as assigned by institution, used to associate multiple individual orders. Uniqueness must be guaranteed within a single trading day. Firms which generate multi-day orders should consider embedding a date within the ListID field to assure uniqueness across days.
+
+
+Added  FIX.2.7		
+67	ListSeqNo	int		
+Sequence of individual order within list (i.e. ListSeqNo of ListNoOrds, 2 of 25, 3 of 25, . . . )
+
+
+Added  FIX.2.7		
+68	TotNoOrders	int		
+Total number of list order entries across all messages. Should be the sum of all NoOrders in each message that has repeating list order entries related to the same ListID. Used to support fragmentation.
+(Prior to FIX 4.2 this field was named "ListNoOrds")
+
+
+Added  FIX.2.7		
+69	ListExecInst	String		
+Free format text message containing list handling and execution instructions.
+
+
+Added  FIX.2.7		
+70	AllocID	String		
+Unique identifier for allocation message.
+(Prior to FIX 4.1 this field was of type int)
+
+
+Added  FIX.2.7		
+71	AllocTransType	char		
+Identifies allocation transaction type
+
+
+Added  FIX.2.7		
+72	RefAllocID	String		
+Reference identifier to be used with Replace, Cancel, and Calculated AllocTransType messages.
+(Prior to FIX 4.1 this field was of type int)
+
+
+Added  FIX.2.7		
+73	NoOrders	int		
+Indicates number of orders to be combined for average pricing and allocation.
+
+
+Added  FIX.2.7		
+74	AvgPrxPrecision	int		
+Indicates number of decimal places to be used for average pricing. Absence of this field indicates that default precision arranged by the broker/institution is to be used.
+
+
+Added  FIX.2.7		
+75	TradeDate	LocalMktDate		
+Indicates date of trade referenced in this message in YYYYMMDD format. Absence of this field indicates current day (expressed in local time at place of trade).
+
+
+Added  FIX.2.7		
+76	ExecBroker	String		
+Identifies executing / give-up broker. Standard NASD market-maker mnemonic is preferred.
+
+
+Added  FIX.2.7		
+77	OpenClose	char		
+Indicates whether the resulting position after a trade should be an opening position or closing position. Used for omnibus accounting - where accounts are held on a gross basis instead of being netted together.
+
+
+Added  FIX.2.7		
+78	NoAllocs	int		
+Number of repeating AllocAccount/AllocPrice entries.
+
+
+Added  FIX.2.7		
+79	AllocAccount	String		
+Sub-account mnemonic
+
+
+Added  FIX.2.7		
+80	AllocShares	Qty		
+Number of shares to be allocated to specific sub-account
+(Prior to FIX 4.2 this field was of type int)
+
+
+Added  FIX.2.7		
+81	ProcessCode	char		
+Processing code for sub-account. Absence of this field in AllocAccount / AllocPrice/AllocShares / ProcessCode instance indicates regular trade.
+
+
+Added  FIX.2.7		
+82	NoRpts	int		
+Total number of reports within series.
+
+
+Added  FIX.2.7		
+83	RptSeq	int		
+Sequence number of message within report series.
+
+
+Added  FIX.2.7		
+84	CxlQty	Qty		
+Total number of shares canceled for this order.
+(Prior to FIX 4.2 this field was of type int)
+
+
+Added  FIX.2.7		
+85	NoDlvyInst	int		
+Number of delivery instruction fields to follow
+No longer used. Included here for reference to prior versions.
+
+
+Added  FIX.2.7	FIX.4.1	
+86	DlvyInst	String		
+Free format text field to indicate delivery instructions
+No longer used. Included here for reference to prior versions.
+
+
+Added  FIX.2.7	FIX.4.1	
+87	AllocStatus	int		
+Identifies status of allocation.
+
+
+Added  FIX.2.7		
+88	AllocRejCode	int		
+Identifies reason for rejection.
+
+
+Added  FIX.2.7		
+89	Signature	data		
+Electronic signature
+
+
+Added  FIX.2.7		
+90	SecureDataLen	Length		
+Length of encrypted message
+
+
+Added  FIX.2.7		
+91	SecureData	data		
+Actual encrypted data stream
+
+
+Added  FIX.2.7		
+92	BrokerOfCredit	String		
+Broker to receive trade credit.
+
+
+Added  FIX.2.7		
+93	SignatureLength	Length		
+Number of bytes in signature field.
+
+
+Added  FIX.2.7		
+94	EmailType	char		
+Email message type.
+
+
+Added  FIX.2.7		
+95	RawDataLength	Length		
+Number of bytes in raw data field.
+
+
+Added  FIX.2.7		
+96	RawData	data		
+Unformatted raw data, can include bitmaps, word processor documents, etc.
+
+
+Added  FIX.2.7		
+97	PossResend	Boolean		
+Indicates that message may contain information that has been sent under another sequence number.
+
+
+Added  FIX.2.7		
+98	EncryptMethod	int		
+Method of encryption.
+
+
+Added  FIX.2.7		
+99	StopPx	Price		
+Price per share
+
+
+Added  FIX.2.7		
+100	ExDestination	Exchange		
+Execution destination as defined by institution when order is entered.
+Valid values:
+See Appendix C
+
+
+Added  FIX.2.7		
+102	CxlRejReason	int		
+Code to identify reason for cancel rejection.
+
+
+Added  FIX.2.7		
+103	OrdRejReason	int		
+Code to identify reason for order rejection.
+
+
+Added  FIX.2.7		
+104	IOIQualifier	char		
+Code to qualify IOI use.
+
+
+Added  FIX.3.0		
+105	WaveNo	String		
+Identifier to aid in the management of multiple lists derived from a single, master list.
+
+
+Added  FIX.3.0		
+106	Issuer	String		
+Company name of security issuer (e.g. International Business Machines)
+
+
+Added  FIX.3.0		
+107	SecurityDesc	String		
+Security description.
+
+
+Added  FIX.3.0		
+108	HeartBtInt	int		
+Heartbeat interval (seconds)
+
+
+Added  FIX.3.0		
+109	ClientID	String		
+Firm identifier used in third party-transactions (should not be a substitute for OnBehalfOfCompID/DeliverToCompID).
+
+
+Added  FIX.3.0		
+110	MinQty	Qty		
+Minimum quantity of an order to be executed.
+(Prior to FIX 4.2 this field was of type int)
+
+
+Added  FIX.3.0		
+111	MaxFloor	Qty		
+Maximum number of shares within an order to be shown on the exchange floor at any given time.
+(Prior to FIX 4.2 this field was of type int)
+
+
+Added  FIX.3.0		
+112	TestReqID	String		
+Identifier included in Test Request message to be returned in resulting Heartbeat
+
+
+Added  FIX.3.0		
+113	ReportToExch	Boolean		
+Identifies party of trade responsible for exchange reporting.
+
+
+Added  FIX.3.0		
+114	LocateReqd	Boolean		
+Indicates whether the broker is to locate the stock in conjunction with a short sell order.
+
+
+Added  FIX.4.0		
+115	OnBehalfOfCompID	String		
+Assigned value used to identify firm originating message if the message was delivered by a third party i.e. the third party firm identifier would be delivered in the SenderCompID field and the firm originating the message in this field.
+
+
+Added  FIX.4.0		
+116	OnBehalfOfSubID	String		
+Assigned value used to identify specific message originator (i.e. trader) if the message was delivered by a third party
+
+
+Added  FIX.4.0		
+117	QuoteID	String		
+Unique identifier for quote
+
+
+Added  FIX.4.0		
+118	NetMoney	Amt		
+Total amount due as the result of the transaction (e.g. for Buy order - principal + commission + fees) reported in currency of execution.
+
+
+Added  FIX.4.0		
+119	SettlCurrAmt	Amt		
+Total amount due expressed in settlement currency (includes the effect of the forex transaction)
+
+
+Added  FIX.4.0		
+120	SettlCurrency	Currency		
+Currency code of settlement denomination.
+
+
+Added  FIX.4.0		
+121	ForexReq	Boolean		
+Indicates request for forex accommodation trade to be executed along with security transaction.
+
+
+Added  FIX.4.0		
+122	OrigSendingTime	UTCTimestamp		
+Original time of message transmission (always expressed in UTC (Universal Time Coordinated, also known as "GMT") when transmitting orders as the result of a resend request.
+
+
+Added  FIX.4.0		
+123	GapFillFlag	Boolean		
+Indicates that the Sequence Reset message is replacing administrative or application messages which will not be resent.
+
+
+Added  FIX.4.0		
+124	NoExecs	int		
+No of execution repeating group entries to follow.
+
+
+Added  FIX.4.0		
+125	CxlType	char		
+No longer used. Included here for reference to prior versions.
+
+
+Added  FIX.4.0	FIX.4.1	
+126	ExpireTime	UTCTimestamp		
+Time/Date of order expiration (always expressed in UTC (Universal Time Coordinated, also known as "GMT")
+
+
+Added  FIX.4.0		
+127	DKReason	char		
+Reason for execution rejection.
+
+
+Added  FIX.4.0		
+128	DeliverToCompID	String		
+Assigned value used to identify the firm targeted to receive the message if the message is delivered by a third party i.e. the third party firm identifier would be delivered in the TargetCompID field and the ultimate receiver firm ID in this field.
+
+
+Added  FIX.4.0		
+129	DeliverToSubID	String		
+Assigned value used to identify specific message recipient (i.e. trader) if the message is delivered by a third party
+
+
+Added  FIX.4.0		
+130	IOINaturalFlag	Boolean		
+Indicates that IOI is the result of an existing agency order or a facilitation position resulting from an agency order, not from principal trading or order solicitation activity.
+
+
+Added  FIX.4.0		
+131	QuoteReqID	String		
+Unique identifier for quote request
+
+
+Added  FIX.4.0		
+132	BidPx	Price		
+Bid price/rate
+
+
+Added  FIX.4.0		
+133	OfferPx	Price		
+Offer price/rate
+
+
+Added  FIX.4.0		
+134	BidSize	Qty		
+Quantity of bid
+(Prior to FIX 4.2 this field was of type int)
+
+
+Added  FIX.4.0		
+135	OfferSize	Qty		
+Quantity of offer
+(Prior to FIX 4.2 this field was of type int)
+
+
+Added  FIX.4.0		
+136	NoMiscFees	int		
+Number of repeating groups of miscellaneous fees
+
+
+Added  FIX.4.0		
+137	MiscFeeAmt	Amt		
+Miscellaneous fee value
+
+
+Added  FIX.4.0		
+138	MiscFeeCurr	Currency		
+Currency of miscellaneous fee
+
+
+Added  FIX.4.0		
+139	MiscFeeType	char		
+Indicates type of miscellaneous fee.
+
+
+Added  FIX.4.0		
+140	PrevClosePx	Price		
+Previous closing price of security.
+
+
+Added  FIX.4.0		
+141	ResetSeqNumFlag	Boolean		
+Indicates that the both sides of the FIX session should reset sequence numbers.
+
+
+Added  FIX.4.1		
+142	SenderLocationID	String		
+Assigned value used to identify specific message originator’s location (i.e. geographic location and/or desk, trader)
+
+
+Added  FIX.4.1		
+143	TargetLocationID	String		
+Assigned value used to identify specific message destination’s location (i.e. geographic location and/or desk, trader)
+
+
+Added  FIX.4.1		
+144	OnBehalfOfLocationID	String		
+Assigned value used to identify specific message originator’s location (i.e. geographic location and/or desk, trader) if the message was delivered by a third party
+
+
+Added  FIX.4.1		
+145	DeliverToLocationID	String		
+Assigned value used to identify specific message recipient’s location (i.e. geographic location and/or desk, trader) if the message was delivered by a third party
+
+
+Added  FIX.4.1		
+146	NoRelatedSym	int		
+Specifies the number of repeating symbols specified.
+
+
+Added  FIX.4.1		
+147	Subject	String		
+The subject of an Email message
+
+
+Added  FIX.4.1		
+148	Headline	String		
+The headline of a News message
+
+
+Added  FIX.4.1		
+149	URLLink	String		
+A URL (Uniform Resource Locator) link to additional information (i.e. http://www.XYZ.com/research.html)
+
+
+Added  FIX.4.1		
+150	ExecType	char		
+Describes the specific ExecutionRpt (i.e. Pending Cancel) while OrdStatus will always identify the current order status (i.e. Partially Filled)
+
+
+Added  FIX.4.1		
+151	LeavesQty	Qty		
+Amount of shares open for further execution. If the OrdStatus is Canceled, DoneForTheDay, Expired, Calculated, or Rejected (in which case the order is no longer active) then LeavesQty could be 0, otherwise LeavesQty = OrderQty - CumQty.
+(Prior to FIX 4.2 this field was of type int)
+
+
+Added  FIX.4.1		
+152	CashOrderQty	Qty		
+Specifies the approximate order quantity desired in total monetary units vs. as a number of shares. The broker would be responsible for converting and calculating a share quantity (OrderQty) based upon this amount to be used for the actual order and subsequent messages.
+
+
+Added  FIX.4.1		
+153	AllocAvgPx	Price		
+AvgPx for a specific AllocAccount
+
+
+Added  FIX.4.1		
+154	AllocNetMoney	Amt		
+NetMoney for a specific AllocAccount
+
+
+Added  FIX.4.1		
+155	SettlCurrFxRate	float		
+Foreign exchange rate used to compute SettlCurrAmt from Currency to SettlCurrency
+
+
+Added  FIX.4.1		
+156	SettlCurrFxRateCalc	char		
+Specifies whether or not SettlCurrFxRate should be multiplied or divided.
+
+
+Added  FIX.4.1		
+157	NumDaysInterest	int		
+Number of Days of Interest for convertible bonds and fixed income
+
+
+Added  FIX.4.1		
+158	AccruedInterestRate	float		
+Accrued Interest Rate for convertible bonds and fixed income
+
+
+Added  FIX.4.1		
+159	AccruedInterestAmt	Amt		
+Amount of Accrued Interest for convertible bonds and fixed income
+
+
+Added  FIX.4.1		
+160	SettlInstMode	char		
+Indicates mode used for Settlement Instructions
+
+
+Added  FIX.4.1		
+161	AllocText	String		
+Free format text related to a specific AllocAccount.
+
+
+Added  FIX.4.1		
+162	SettlInstID	String		
+Unique identifier for Settlement Instructions message.
+
+
+Added  FIX.4.1		
+163	SettlInstTransType	char		
+Settlement Instructions message transaction type
+
+
+Added  FIX.4.1		
+164	EmailThreadID	String		
+Unique identifier for an email thread (new and chain of replies)
+
+
+Added  FIX.4.1		
+165	SettlInstSource	char		
+Indicates source of Settlement Instructions
+
+
+Added  FIX.4.1		
+166	SettlLocation	String		
+Identifies Settlement Depository or Country Code (ISITC spec)
+
+
+Added  FIX.4.1		
+167	SecurityType	String		
+Indicates type of security (ISITC spec)
+
+
+Added  FIX.4.1		
+168	EffectiveTime	UTCTimestamp		
+Time the details within the message should take effect (always expressed in UTC (Universal Time Coordinated, also known as "GMT")
+
+
+Added  FIX.4.1		
+169	StandInstDbType	int		
+Identifies the Standing Instruction database used
+
+
+Added  FIX.4.1		
+170	StandInstDbName	String		
+Name of the Standing Instruction database represented with StandInstDbType (i.e. the Global Custodian’s name).
+
+
+Added  FIX.4.1		
+171	StandInstDbID	String		
+Unique identifier used on the Standing Instructions database for the Standing Instructions to be referenced.
+
+
+Added  FIX.4.1		
+172	SettlDeliveryType	int		
+Identifies type of settlement
+
+
+Added  FIX.4.1		
+173	SettlDepositoryCode	String		
+Broker’s account code at the depository (i.e. CEDEL ID for CEDEL, FINS for DTC, or Euroclear ID for Euroclear) if SettlLocation is a depository
+
+
+Added  FIX.4.1		
+174	SettlBrkrCode	String		
+BIC (Bank Identification Code—Swift managed) code of the broker involved (i.e. for multi-company brokerage firms)
+
+
+Added  FIX.4.1		
+175	SettlInstCode	String		
+BIC (Bank Identification Code—Swift managed) code of the institution involved (i.e. for multi-company institution firms)
+
+
+Added  FIX.4.1		
+176	SecuritySettlAgentName	String		
+Name of SettlInstSource's local agent bank if SettlLocation is not a depository
+
+
+Added  FIX.4.1		
+177	SecuritySettlAgentCode	String		
+BIC (Bank Identification Code--Swift managed) code of the SettlInstSource's local agent bank if SettlLocation is not a depository
+
+
+Added  FIX.4.1		
+178	SecuritySettlAgentAcctNum	String		
+SettlInstSource's account number at local agent bank if SettlLocation is not a depository
+
+
+Added  FIX.4.1		
+179	SecuritySettlAgentAcctName	String		
+Name of SettlInstSource's account at local agent bank if SettlLocation is not a depository
+
+
+Added  FIX.4.1		
+180	SecuritySettlAgentContactName	String		
+Name of contact at local agent bank for SettlInstSource's account if SettlLocation is not a depository
+
+
+Added  FIX.4.1		
+181	SecuritySettlAgentContactPhone	String		
+Phone number for contact at local agent bank if SettlLocation is not a depository
+
+
+Added  FIX.4.1		
+182	CashSettlAgentName	String		
+Name of SettlInstSource's local agent bank if SettlDeliveryType=Free
+
+
+Added  FIX.4.1		
+183	CashSettlAgentCode	String		
+BIC (Bank Identification Code--Swift managed) code of the SettlInstSource's local agent bank if SettlDeliveryType=Free
+
+
+Added  FIX.4.1		
+184	CashSettlAgentAcctNum	String		
+SettlInstSource's account number at local agent bank if SettlDeliveryType=Free
+
+
+Added  FIX.4.1		
+185	CashSettlAgentAcctName	String		
+Name of SettlInstSource's account at local agent bank if SettlDeliveryType=Free
+
+
+Added  FIX.4.1		
+186	CashSettlAgentContactName	String		
+Name of contact at local agent bank for SettlInstSource's account if SettlDeliveryType=Free
+
+
+Added  FIX.4.1		
+187	CashSettlAgentContactPhone	String		
+Phone number for contact at local agent bank for SettlInstSource's account if SettlDeliveryType=Free
+
+
+Added  FIX.4.1		
+188	BidSpotRate	Price		
+Bid F/X spot rate.y vary and not limited to four)
+
+
+Added  FIX.4.1		
+189	BidForwardPoints	PriceOffset		
+Bid F/X forward points added to spot rate. May be a negative value.
+
+
+Added  FIX.4.1		
+190	OfferSpotRate	Price		
+Offer F/X spot rate.
+
+
+Added  FIX.4.1		
+191	OfferForwardPoints	PriceOffset		
+Offer F/X forward points added to spot rate. May be a negative value.
+
+
+Added  FIX.4.1		
+192	OrderQty2	Qty		
+OrderQty of the future part of a F/X swap order.
+
+
+Added  FIX.4.1		
+193	FutSettDate2	LocalMktDate		
+FutSettDate of the future part of a F/X swap order.
+
+
+Added  FIX.4.1		
+194	LastSpotRate	Price		
+F/X spot rate.
+
+
+Added  FIX.4.1		
+195	LastForwardPoints	PriceOffset		
+F/X forward points added to LastSpotRate. May be a negative value.
+
+
+Added  FIX.4.1		
+196	AllocLinkID	String		
+Can be used to link two different Allocation messages (each with unique AllocID) together, i.e. for F/X "Netting" or "Swaps". Should be unique.
+
+
+Added  FIX.4.1		
+197	AllocLinkType	int		
+Identifies the type of Allocation linkage when AllocLinkID is used.
+
+
+Added  FIX.4.1		
+198	SecondaryOrderID	String		
+Assigned by the party which accepts the order. Can be used to provide the OrderID used by an exchange or executing system.
+
+
+Added  FIX.4.1		
+199	NoIOIQualifiers	int		
+Number of repeating groups of IOIQualifiers.
+
+
+Added  FIX.4.1		
+200	MaturityMonthYear	MonthYear		
+Month and Year of the maturity for SecurityType=FUT or SecurityType=OPT. Required if MaturityDay is specified.
+Format: YYYYMM
+(i.e. 199903)
+
+
+Added  FIX.4.1		
+201	PutOrCall	int		
+Indicates whether an Option is for a put or call.
+
+
+Added  FIX.4.1		
+202	StrikePrice	Price		
+Strike Price for an Option.
+
+
+Added  FIX.4.1		
+203	CoveredOrUncovered	int		
+Used for options
+
+
+Added  FIX.4.1		
+204	CustomerOrFirm	int		
+Used for options when delivering the order to an execution system/exchange to specify if the order is for a customer or the firm placing the order itself.
+
+
+Added  FIX.4.1		
+205	MaturityDay	DayOfMonth		
+Day of month used in conjunction with MaturityMonthYear to specify the maturity date for SecurityType=FUT or SecurityType=OPT.
+
+
+Added  FIX.4.1		
+206	OptAttribute	char		
+Can be used for SecurityType=OPT to identify a particular security.
+
+
+Added  FIX.4.1		
+207	SecurityExchange	Exchange		
+Market used to help identify a security.
+
+
+Added  FIX.4.1		
+208	NotifyBrokerOfCredit	Boolean		
+Indicates whether or not details should be communicated to BrokerOfCredit (i.e. step-in broker).
+
+
+Added  FIX.4.1		
+209	AllocHandlInst	int		
+Indicates how the receiver (i.e. third party) of Allocation message should handle/process the account details.
+
+
+Added  FIX.4.1		
+210	MaxShow	Qty		
+Maximum number of shares within an order to be shown to other customers (i.e. sent via an IOI).
+(Prior to FIX 4.2 this field was of type int)
+
+
+Added  FIX.4.1		
+211	PegDifference	PriceOffset		
+Amount (signed) added to the price of the peg for a pegged order.
+
+
+Added  FIX.4.1		
+212	XmlDataLen	Length		
+Length of the XmlData data block.
+
+
+Added  FIX.4.2		
+213	XmlData	data		
+Actual XML data stream (e.g. FIXML). See approriate XML reference (e.g. FIXML). Note: may contain embedded SOH characters.
+
+
+Added  FIX.4.2		
+214	SettlInstRefID	String		
+Reference identifier for the SettlInstID with Cancel and Replace SettlInstTransType transaction types.
+
+
+Added  FIX.4.2		
+215	NoRoutingIDs	int		
+Number of repeating groups of RoutingID and RoutingType values.
+See Appendix L – Pre-Trade Message Targeting/Routing
+
+
+Added  FIX.4.2		
+216	RoutingType	int		
+Indicates the type of RoutingID specified.
+
+
+Added  FIX.4.2		
+217	RoutingID	String		
+Assigned value used to identify a specific routing destination.
+
+
+Added  FIX.4.2		
+218	SpreadToBenchmark	PriceOffset		
+For Fixed Income. Basis points relative to a benchmark. To be expressed as "count of basis points" (vs. an absolute value). E.g. High Grade Corporate Bonds may express price as basis points relative to benchmark (the Benchmark field). Note: Basis points can be negative.
+
+
+Added  FIX.4.2		
+219	Benchmark	char		
+For Fixed Income. Identifies the benchmark (e.g. used in conjunction with the SpreadToBenchmark field).
+
+
+Added  FIX.4.2		
+223	CouponRate	float		
+For Fixed Income. Coupon rate of the bond. Will be zero for step-up bonds.
+
+
+Added  FIX.4.2		
+231	ContractMultiplier	float		
+Specifies the ratio or multiply factor to convert from contracts to shares (e.g. 1.0, 100, 1000, etc). Applicable For Fixed Income, Convertible Bonds, Derivatives, etc. Note: If used, quantities should be expressed in the "nominal" (e.g. contracts vs. shares) amount.
+
+
+Added  FIX.4.2		
+262	MDReqID	String		
+Unique identifier for Market Data Request
+
+
+Added  FIX.4.2		
+263	SubscriptionRequestType	char		
+Subscription Request Type
+
+
+Added  FIX.4.2		
+264	MarketDepth	int		
+Depth of market for Book Snapshot
+
+
+Added  FIX.4.2		
+265	MDUpdateType	int		
+Specifies the type of Market Data update.
+
+
+Added  FIX.4.2		
+266	AggregatedBook	Boolean		
+Specifies whether or not book entries should be aggregated.
+
+
+Added  FIX.4.2		
+267	NoMDEntryTypes	int		
+Number of MDEntryType fields requested.
+
+
+Added  FIX.4.2		
+268	NoMDEntries	int		
+Number of entries in Market Data message.
+
+
+Added  FIX.4.2		
+269	MDEntryType	char		
+Type Market Data entry.
+
+
+Added  FIX.4.2		
+270	MDEntryPx	Price		
+Price of the Market Data Entry.
+
+
+Added  FIX.4.2		
+271	MDEntrySize	Qty		
+Number of shares represented by the Market Data Entry.
+
+
+Added  FIX.4.2		
+272	MDEntryDate	UTCDate		
+Date of Market Data Entry.
+
+
+Added  FIX.4.2		
+273	MDEntryTime	UTCTimeOnly		
+Time of Market Data Entry.
+
+
+Added  FIX.4.2		
+274	TickDirection	char		
+Direction of the "tick".
+
+
+Added  FIX.4.2		
+275	MDMkt	Exchange		
+Market posting quote / trade.
+Valid values:
+See Appendix C
+
+
+Added  FIX.4.2		
+276	QuoteCondition	MultipleValueString		
+Space-delimited list of conditions describing a quote.
+
+
+Added  FIX.4.2		
+277	TradeCondition	MultipleValueString		
+Space-delimited list of conditions describing a trade
+
+
+Added  FIX.4.2		
+278	MDEntryID	String		
+Unique Market Data Entry identifier.
+
+
+Added  FIX.4.2		
+279	MDUpdateAction	char		
+Type of Market Data update action.
+
+
+Added  FIX.4.2		
+280	MDEntryRefID	String		
+Refers to a previous MDEntryID.
+
+
+Added  FIX.4.2		
+281	MDReqRejReason	char		
+Reason for the rejection of a Market Data request.
+
+
+Added  FIX.4.2		
+282	MDEntryOriginator	String		
+Originator of a Market Data Entry
+
+
+Added  FIX.4.2		
+283	LocationID	String		
+Identification of a Market Maker’s location
+
+
+Added  FIX.4.2		
+284	DeskID	String		
+Identification of a Market Maker’s desk
+
+
+Added  FIX.4.2		
+285	DeleteReason	char		
+Reason for deletion.
+
+
+Added  FIX.4.2		
+286	OpenCloseSettleFlag	char		
+Flag that identifies a price.
+
+
+Added  FIX.4.2		
+287	SellerDays	int		
+Specifies the number of days that may elapse before delivery of the security
+
+
+Added  FIX.4.2		
+288	MDEntryBuyer	String		
+Buying party in a trade
+
+
+Added  FIX.4.2		
+289	MDEntrySeller	String		
+Selling party in a trade
+
+
+Added  FIX.4.2		
+290	MDEntryPositionNo	int		
+Display position of a bid or offer, numbered from most competitive to least competitive, per market side, beginning with 1.
+
+
+Added  FIX.4.2		
+291	FinancialStatus	char		
+Identifies a firm’s financial status.
+
+
+Added  FIX.4.2		
+292	CorporateAction	char		
+Identifies the type of Corporate Action.
+
+
+Added  FIX.4.2		
+293	DefBidSize	Qty		
+Default Bid Size.
+
+
+Added  FIX.4.2		
+294	DefOfferSize	Qty		
+Default Offer Size.
+
+
+Added  FIX.4.2		
+295	NoQuoteEntries	int		
+The number of quote entries for a QuoteSet.
+
+
+Added  FIX.4.2		
+296	NoQuoteSets	int		
+The number of sets of quotes in the message.
+
+
+Added  FIX.4.2		
+297	QuoteAckStatus	int		
+Identifies the status of the quote acknowledgement.
+
+
+Added  FIX.4.2		
+298	QuoteCancelType	int		
+Identifies the type of quote cancel.
+
+
+Added  FIX.4.2		
+299	QuoteEntryID	String		
+Uniquely identifies the quote as part of a QuoteSet.
+
+
+Added  FIX.4.2		
+300	QuoteRejectReason	int		
+Reason Quote was rejected:
+
+
+Added  FIX.4.2		
+301	QuoteResponseLevel	int		
+Level of Response requested from receiver of quote messages.
+
+
+Added  FIX.4.2		
+302	QuoteSetID	String		
+Unique id for the Quote Set.
+
+
+Added  FIX.4.2		
+303	QuoteRequestType	int		
+Indicates the type of Quote Request being generated
+
+
+Added  FIX.4.2		
+304	TotQuoteEntries	int		
+Total number of quotes for the quote set across all messages. Should be the sum of all NoQuoteEntries in each message that has repeating quotes that are part of the same quote set.
+
+
+Added  FIX.4.2		
+305	UnderlyingIDSource	String		
+Underlying security’s IDSource.
+
+
+Added  FIX.4.2		
+306	UnderlyingIssuer	String		
+Underlying security’s Issuer.
+See Issuer field for description
+
+
+Added  FIX.4.2		
+307	UnderlyingSecurityDesc	String		
+Underlying security’s SecurityDesc.
+See SecurityDesc field for description
+
+
+Added  FIX.4.2		
+308	UnderlyingSecurityExchange	Exchange		
+Underlying security’s SecurityExchange. Can be used to identify the underlying security.
+
+
+Added  FIX.4.2		
+309	UnderlyingSecurityID	String		
+Underlying security’s SecurityID.
+See SecurityID field for description
+
+
+Added  FIX.4.2		
+310	UnderlyingSecurityType	String		
+Underlying security’s SecurityType.
+
+
+Added  FIX.4.2		
+311	UnderlyingSymbol	String		
+Underlying security’s Symbol.
+See Symbol field for description
+
+
+Added  FIX.4.2		
+312	UnderlyingSymbolSfx	String		
+Underlying security’s SymbolSfx.
+See SymbolSfx field for description
+
+
+Added  FIX.4.2		
+313	UnderlyingMaturityMonthYear	MonthYear		
+Underlying security’s MaturityMonthYear. Required if UnderlyingMaturityDay is specified.
+See MaturityMonthYear field for description
+
+
+Added  FIX.4.2		
+314	UnderlyingMaturityDay	DayOfMonth		
+Underlying security’s MaturityDay.
+See MaturityDay field for description
+
+
+Added  FIX.4.2		
+315	UnderlyingPutOrCall	int		
+Underlying security’s PutOrCall.
+See PutOrCall field for description
+
+
+Added  FIX.4.2		
+316	UnderlyingStrikePrice	Price		
+Underlying security’s StrikePrice.
+See StrikePrice field for description
+
+
+Added  FIX.4.2		
+317	UnderlyingOptAttribute	char		
+Underlying security’s OptAttribute.
+See OptAttribute field for description
+
+
+Added  FIX.4.2		
+318	UnderlyingCurrency	Currency		
+Underlying security’s Currency.
+See Currency field for description and valid values
+
+
+Added  FIX.4.2		
+319	RatioQty	Quantity		
+Quantity of a particular leg in the security.
+
+
+Added  FIX.4.2		
+320	SecurityReqID	String		
+Unique ID of a Security Definition Request.
+
+
+Added  FIX.4.2		
+321	SecurityRequestType	int		
+Type of Security Definition Request.
+
+
+Added  FIX.4.2		
+322	SecurityResponseID	String		
+Unique ID of a Security Definition message.
+
+
+Added  FIX.4.2		
+323	SecurityResponseType	int		
+Type of Security Definition message response.
+
+
+Added  FIX.4.2		
+324	SecurityStatusReqID	String		
+Unique ID of a Security Status Request message.
+
+
+Added  FIX.4.2		
+325	UnsolicitedIndicator	Boolean		
+Indicates whether or not message is being sent as a result of a subscription request or not.
+
+
+Added  FIX.4.2		
+326	SecurityTradingStatus	int		
+Identifies the trading status applicable to the transaction.
+
+
+Added  FIX.4.2		
+327	HaltReason	char		
+Denotes the reason for the Opening Delay or Trading Halt.
+
+
+Added  FIX.4.2		
+328	InViewOfCommon	Boolean		
+Indicates whether or not the halt was due to Common Stock trading being halted.
+
+
+Added  FIX.4.2		
+329	DueToRelated	Boolean		
+Indicates whether or not the halt was due to the Related Security being halted.
+
+
+Added  FIX.4.2		
+330	BuyVolume	Qty		
+Number of shares bought.
+
+
+Added  FIX.4.2		
+331	SellVolume	Qty		
+Number of shares sold.
+
+
+Added  FIX.4.2		
+332	HighPx	Price		
+Represents an indication of the high end of the price range for a security prior to the open or reopen
+
+
+Added  FIX.4.2		
+333	LowPx	Price		
+Represents an indication of the low end of the price range for a security prior to the open or reopen
+
+
+Added  FIX.4.2		
+334	Adjustment	int		
+Identifies the type of adjustment.
+
+
+Added  FIX.4.2		
+335	TradSesReqID	String		
+Unique ID of a Trading Session Status message.
+
+
+Added  FIX.4.2		
+336	TradingSessionID	String		
+Identifier for Trading Session
+Can be used to represent a specific market trading session (e.g. "PRE-OPEN", "CROSS_2", "AFTER-HOURS", "TOSTNET1", "TOSTNET2", etc).
+Values should be bi-laterally agreed to between counterparties.
+
+
+Added  FIX.4.2		
+337	ContraTrader	String		
+Identifies the trader (e.g. "badge number") of the ContraBroker.
+
+
+Added  FIX.4.2		
+338	TradSesMethod	int		
+Method of trading
+
+
+Added  FIX.4.2		
+339	TradSesMode	int		
+Trading Session Mode
+
+
+Added  FIX.4.2		
+340	TradSesStatus	int		
+State of the trading session.
+
+
+Added  FIX.4.2		
+341	TradSesStartTime	UTCTimestamp		
+Starting time of the trading session
+
+
+Added  FIX.4.2		
+342	TradSesOpenTime	UTCTimestamp		
+Time of the opening of the trading session
+
+
+Added  FIX.4.2		
+343	TradSesPreCloseTime	UTCTimestamp		
+Time of the pre-closed of the trading session
+
+
+Added  FIX.4.2		
+344	TradSesCloseTime	UTCTimestamp		
+Closing time of the trading session
+
+
+Added  FIX.4.2		
+345	TradSesEndTime	UTCTimestamp		
+End time of the trading session
+
+
+Added  FIX.4.2		
+346	NumberOfOrders	int		
+Number of orders in the market.
+
+
+Added  FIX.4.2		
+347	MessageEncoding	String		
+Type of message encoding (non-ASCII (non-English) characters) used in a message’s "Encoded" fields.
+
+
+Added  FIX.4.2		
+348	EncodedIssuerLen	Length		
+Byte length of encoded (non-ASCII characters) EncodedIssuer field.
+
+
+Added  FIX.4.2		
+349	EncodedIssuer	data		
+Encoded (non-ASCII characters) representation of the Issuer field in the encoded format specified via the MessageEncoding field. If used, the ASCII (English) representation should also be specified in the Issuer field.
+
+
+Added  FIX.4.2		
+350	EncodedSecurityDescLen	Length		
+Byte length of encoded (non-ASCII characters) EncodedSecurityDesc field.
+
+
+Added  FIX.4.2		
+351	EncodedSecurityDesc	data		
+Encoded (non-ASCII characters) representation of the SecurityDesc field in the encoded format specified via the MessageEncoding field. If used, the ASCII (English) representation should also be specified in the SecurityDesc field.
+
+
+Added  FIX.4.2		
+352	EncodedListExecInstLen	Length		
+Byte length of encoded (non-ASCII characters) EncodedListExecInst field.
+
+
+Added  FIX.4.2		
+353	EncodedListExecInst	data		
+Encoded (non-ASCII characters) representation of the ListExecInst field in the encoded format specified via the MessageEncoding field. If used, the ASCII (English) representation should also be specified in the ListExecInst field.
+
+
+Added  FIX.4.2		
+354	EncodedTextLen	Length		
+Byte length of encoded (non-ASCII characters) EncodedText field.
+
+
+Added  FIX.4.2		
+355	EncodedText	data		
+Encoded (non-ASCII characters) representation of the Text field in the encoded format specified via the MessageEncoding field. If used, the ASCII (English) representation should also be specified in the Text field.
+
+
+Added  FIX.4.2		
+356	EncodedSubjectLen	Length		
+Byte length of encoded (non-ASCII characters) EncodedSubject field.
+
+
+Added  FIX.4.2		
+357	EncodedSubject	data		
+Encoded (non-ASCII characters) representation of the Subject field in the encoded format specified via the MessageEncoding field. If used, the ASCII (English) representation should also be specified in the Subject field.
+
+
+Added  FIX.4.2		
+358	EncodedHeadlineLen	Length		
+Byte length of encoded (non-ASCII characters) EncodedHeadline field.
+
+
+Added  FIX.4.2		
+359	EncodedHeadline	data		
+Encoded (non-ASCII characters) representation of the Headline field in the encoded format specified via the MessageEncoding field. If used, the ASCII (English) representation should also be specified in the Headline field.
+
+
+Added  FIX.4.2		
+360	EncodedAllocTextLen	Length		
+Byte length of encoded (non-ASCII characters) EncodedAllocText field.
+
+
+Added  FIX.4.2		
+361	EncodedAllocText	data		
+Encoded (non-ASCII characters) representation of the AllocText field in the encoded format specified via the MessageEncoding field. If used, the ASCII (English) representation should also be specified in the AllocText field.
+
+
+Added  FIX.4.2		
+362	EncodedUnderlyingIssuerLen	Length		
+Byte length of encoded (non-ASCII characters) EncodedUnderlyingIssuer field.
+
+
+Added  FIX.4.2		
+363	EncodedUnderlyingIssuer	data		
+Encoded (non-ASCII characters) representation of the UnderlyingIssuer field in the encoded format specified via the MessageEncoding field. If used, the ASCII (English) representation should also be specified in the UnderlyingIssuer field.
+
+
+Added  FIX.4.2		
+364	EncodedUnderlyingSecurityDescLen	Length		
+Byte length of encoded (non-ASCII characters) EncodedUnderlyingSecurityDesc field.
+
+
+Added  FIX.4.2		
+365	EncodedUnderlyingSecurityDesc	data		
+Encoded (non-ASCII characters) representation of the UnderlyingSecurityDesc field in the encoded format specified via the MessageEncoding field. If used, the ASCII (English) representation should also be specified in the UnderlyingSecurityeDesc field.
+
+
+Added  FIX.4.2		
+366	AllocPrice	Price		
+Executed price for an AllocAccount entry used when using "executed price" vs. "average price" allocations (e.g. Japan).
+
+
+Added  FIX.4.2		
+367	QuoteSetValidUntilTime	UTCTimestamp		
+Indicates expiration time of this particular QuoteSet (always expressed in UTC (Universal Time Coordinated, also known as "GMT")
+
+
+Added  FIX.4.2		
+368	QuoteEntryRejectReason	int		
+Reason Quote Entry was rejected:
+
+
+Added  FIX.4.2		
+369	LastMsgSeqNumProcessed	int		
+The last MsgSeqNum value received and processed. Can be specified on every message sent. Useful for detecting a backlog with a counterparty.
+
+
+Added  FIX.4.2		
+370	OnBehalfOfSendingTime	UTCTimestamp		
+Used when a message is sent via a "hub" or "service bureau". If A sends to Q (the hub) who then sends to B via a separate FIX session, then when Q sends to B the value of this field should represent the SendingTime on the message A sent to Q. (always expressed in UTC (Universal Time Coordinated, also known as "GMT")
+
+
+Added  FIX.4.2		
+371	RefTagID	int		
+The tag number of the FIX field being referenced.
+
+
+Added  FIX.4.2		
+372	RefMsgType	String		
+The MsgType of the FIX message being referenced.
+
+
+Added  FIX.4.2		
+373	SessionRejectReason	int		
+Code to identify reason for a session-level Reject message.
+
+
+Added  FIX.4.2		
+374	BidRequestTransType	char		
+Identifies the Bid Request message type.
+
+
+Added  FIX.4.2		
+375	ContraBroker	String		
+Identifies contra broker. Standard NASD market-maker mnemonic is preferred.
+
+
+Added  FIX.4.2		
+376	ComplianceID	String		
+ID used to represent this transaction for compliance purposes (e.g. OATS reporting).
+
+
+Added  FIX.4.2		
+377	SolicitedFlag	Boolean		
+Indicates whether or not the order was solicited.
+
+
+Added  FIX.4.2		
+378	ExecRestatementReason	int		
+Code to identify reason for an ExecutionRpt message sent with ExecType=Restated or used when communicating an unsolicited cancel.
+
+
+Added  FIX.4.2		
+379	BusinessRejectRefID	String		
+The value of the business-level "ID" field on the message being referenced.
+
+
+Added  FIX.4.2		
+380	BusinessRejectReason	int		
+Code to identify reason for a Business Message Reject message.
+
+
+Added  FIX.4.2		
+381	GrossTradeAmt	Amt		
+Total amount traded (e.g. CumQty * AvgPx) expressed in units of currency.
+
+
+Added  FIX.4.2		
+382	NoContraBrokers	int		
+The number of ContraBroker entries.
+
+
+Added  FIX.4.2		
+383	MaxMessageSize	int		
+Maximum number of bytes supported for a single message.
+
+
+Added  FIX.4.2		
+384	NoMsgTypes	int		
+Number of MsgTypes in repeating group.
+
+
+Added  FIX.4.2		
+385	MsgDirection	char		
+Specifies the direction of the messsage.
+
+
+Added  FIX.4.2		
+386	NoTradingSessions	int		
+Number of TradingSessionIDs in repeating group.
+
+
+Added  FIX.4.2		
+387	TotalVolumeTraded	Qty		
+Total volume (quantity) traded.
+
+
+Added  FIX.4.2		
+388	DiscretionInst	char		
+Code to identify the price a DiscretionOffset is related to and should be mathematically added to.
+
+
+Added  FIX.4.2		
+389	DiscretionOffset	PriceOffset		
+Amount (signed) added to the "related to" price specified via DiscretionInst.
+
+
+Added  FIX.4.2		
+390	BidID	String		
+Unique identifier for Bid Response as assigned by broker. Uniqueness must be guaranteed within a single trading day.
+
+
+Added  FIX.4.2		
+391	ClientBidID	String		
+Unique identifier for a Bid Request as assigned by institution. Uniqueness must be guaranteed within a single trading day.
+
+
+Added  FIX.4.2		
+392	ListName	String		
+Descriptive name for list order.
+
+
+Added  FIX.4.2		
+393	TotalNumSecurities	int		
+Total number of securities.
+
+
+Added  FIX.4.2		
+394	BidType	int		
+Code to identify the type of Bid Request.
+
+
+Added  FIX.4.2		
+395	NumTickets	int		
+Total number of tickets.
+
+
+Added  FIX.4.2		
+396	SideValue1	Amt		
+Amounts in currency
+
+
+Added  FIX.4.2		
+397	SideValue2	Amt		
+Amounts in currency
+
+
+Added  FIX.4.2		
+398	NoBidDescriptors	int		
+Number of BidDescriptor entries.
+
+
+Added  FIX.4.2		
+399	BidDescriptorType	int		
+Code to identify the type of BidDescriptor.
+
+
+Added  FIX.4.2		
+400	BidDescriptor	String		
+BidDescriptor value. Usage depends upon BidDescriptorType.
+
+
+Added  FIX.4.2		
+401	SideValueInd	int		
+Code to identify which "SideValue" the value refers to. SideValue1 and SideValue2 are used as opposed to Buy or Sell so that the basket can be quoted either way as Buy or Sell.
+
+
+Added  FIX.4.2		
+402	LiquidityPctLow	float		
+Liquidity indicator or lower limit if TotalNumSecurities > 1. Represented as a percentage.
+
+
+Added  FIX.4.2		
+403	LiquidityPctHigh	float		
+Upper liquidity indicator if TotalNumSecurities > 1. Represented as a percentage.
+
+
+Added  FIX.4.2		
+404	LiquidityValue	Amt		
+Value between LiquidityPctLow and LiquidityPctHigh in Currency
+
+
+Added  FIX.4.2		
+405	EFPTrackingError	float		
+Eg Used in EFP trades 12% (EFP – Exchange for Physical ). Represented as a percentage.
+
+
+Added  FIX.4.2		
+406	FairValue	Amt		
+Used in EFP trades
+
+
+Added  FIX.4.2		
+407	OutsideIndexPct	float		
+Used in EFP trades. Represented as a percentage.
+
+
+Added  FIX.4.2		
+408	ValueOfFutures	Amt		
+Used in EFP trades
+
+
+Added  FIX.4.2		
+409	LiquidityIndType	int		
+Code to identify the type of liquidity indicator.
+
+
+Added  FIX.4.2		
+410	WtAverageLiquidity	float		
+Overall weighted average liquidity expressed as a % of average daily volume. Represented as a percentage.
+
+
+Added  FIX.4.2		
+411	ExchangeForPhysical	Boolean		
+Indicates whether or not to exchange for phsyical.
+
+
+Added  FIX.4.2		
+412	OutMainCntryUIndex	Amt		
+Value of stocks in Currency
+
+
+Added  FIX.4.2		
+413	CrossPercent	float		
+Percentage of program that crosses in Currency. Represented as a percentage.
+
+
+Added  FIX.4.2		
+414	ProgRptReqs	int		
+Code to identify the desired frequency of progress reports.
+
+
+Added  FIX.4.2		
+415	ProgPeriodInterval	int		
+Time in minutes between each ListStatus report sent by SellSide. Zero means don’t send status.
+
+
+Added  FIX.4.2		
+416	IncTaxInd	int		
+Code to represent whether value is net (inclusive of tax) or gross.
+
+
+Added  FIX.4.2		
+417	NumBidders	int		
+Indicates the total number of bidders on the list
+
+
+Added  FIX.4.2		
+418	TradeType	char		
+Code to represent the type of trade.
+
+
+Added  FIX.4.2		
+419	BasisPxType	char		
+Code to represent the basis price type.
+
+
+Added  FIX.4.2		
+420	NoBidComponents	int		
+Indicates the number of list entries.
+
+
+Added  FIX.4.2		
+421	Country	String		
+ISO Country Code in field
+
+
+Added  FIX.4.2		
+422	TotNoStrikes	int		
+Total number of strike price entries across all messages. Should be the sum of all NoStrikes in each message that has repeating strike price entries related to the same ListID. Used to support fragmentation.
+
+
+Added  FIX.4.2		
+423	PriceType	int		
+Code to represent the price type.
+
+
+Added  FIX.4.2		
+424	DayOrderQty	Qty		
+For GT orders, the OrderQty less all shares (adjusted for stock splits) that traded on previous days. DayOrderQty = OrderQty – (CumQty - DayCumQty)
+
+
+Added  FIX.4.2		
+425	DayCumQty	Qty		
+The number of shares on a GT order that have traded today.
+
+
+Added  FIX.4.2		
+426	DayAvgPx	Price		
+The average price of shares on a GT order that have traded today.
+
+
+Added  FIX.4.2		
+427	GTBookingInst	int		
+Code to identify whether to book out executions on a part-filled GT order on the day of execution or to accumulate.
+
+
+Added  FIX.4.2		
+428	NoStrikes	int		
+Number of list strike price entries.
+
+
+Added  FIX.4.2		
+429	ListStatusType	int		
+Code to represent the price type.
+
+
+Added  FIX.4.2		
+430	NetGrossInd	int		
+Code to represent whether value is net (inclusive of tax) or gross.
+
+
+Added  FIX.4.2		
+431	ListOrderStatus	int		
+Code to represent the status of a list order.
+
+
+Added  FIX.4.2		
+432	ExpireDate	LocalMktDate		
+Date of order expiration (last day the order can trade), always expressed in terms of the local market date. The time at which the order expires is determined by the local market’s business practices
+
+
+Added  FIX.4.2		
+433	ListExecInstType	char		
+Identifies the type of ListExecInst.
+
+
+Added  FIX.4.2		
+434	CxlRejResponseTo	char		
+Identifies the type of request that a Cancel Reject is in response to.
+
+
+Added  FIX.4.2		
+435	UnderlyingCouponRate	float		
+Underlying security’s CouponRate.
+See CouponRate field for description
+
+
+Added  FIX.4.2		
+436	UnderlyingContractMultiplier	float		
+Underlying security’s ContractMultiplier.
+See ContractMultiplier field for description
+
+
+Added  FIX.4.2		
+437	ContraTradeQty	Qty		
+Quantity traded with the ContraBroker.
+
+
+Added  FIX.4.2		
+438	ContraTradeTime	UTCTimestamp		
+Identifes the time of the trade with the ContraBroker. (always expressed in UTC (Universal Time Coordinated, also known as "GMT")
+
+
+Added  FIX.4.2		
+439	ClearingFirm	String		
+Firm that will clear the trade. Used if different from the executing firm.
+
+
+Added  FIX.4.2		
+440	ClearingAccount	String		
+Supplemental accounting information forwared to clearing house/firm.
+
+
+Added  FIX.4.2		
+441	LiquidityNumSecurities	int		
+Number of Securites between LiquidityPctLow and LiquidityPctHigh in Currency.
+
+
+Added  FIX.4.2		
+442	MultiLegReportingType	char		
+Used to indicate what an Execution Report represents (e.g. used with multi-leg securiteis, such as option strategies, spreads, etc.).
+
+
+Added  FIX.4.2		
+443	StrikeTime	UTCTimestamp		
+The time at which current market prices are used to determine the value of a basket.
+
+
+Added  FIX.4.2		
+444	ListStatusText	String		
+Free format text string related to List Status.
+
+
+Added  FIX.4.2		
+445	EncodedListStatusTextLen	Length		
+Byte length of encoded (non-ASCII characters) EncodedListStatusText field.
+
+
+Added  FIX.4.2		
+446	EncodedListStatusText	data		
+Encoded (non-ASCII characters) representation of the ListStatusText field in the encoded format specified via the MessageEncoding field. If used, the ASCII (English) representation should also be specified in the ListStatusText field.
+
+
+Added  FIX.4.2		
+
