@@ -58,7 +58,8 @@ Ensure the gridlock .el files are in your load-path.  Then craft something like 
 
 #### CSV ####
 
-```(use-package gridlock-csv  
+```
+  (use-package gridlock-csv  
   :after csv-mode  
   :bind (:map csv-mode-map ("C-c C-l" . gridlock-csv-mode)))
 ```  
